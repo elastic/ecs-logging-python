@@ -1,1 +1,1 @@
-ECS_VERSION = "1.0.0"
+ECS_VERSION = "1.5.0"
