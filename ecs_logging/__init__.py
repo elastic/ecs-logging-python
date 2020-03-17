@@ -1,4 +1,4 @@
-"""Logging formatters for ECS in Python"""
+"""Logging formatters for ECS (Elastic Common Schema) in Python"""
 
 from ._meta import ECS_VERSION
 from ._stdlib import StdlibFormatter
