@@ -47,18 +47,33 @@ pipeline {
       }
     }
     stage('Test') {
-      options { skipDefaultCheckout() }
-      steps {
-        deleteDir()
-        unstash "source"
-        dir("${BASE_DIR}"){
-          script {
-            def mapParallelTasks = [:]
-            // Let's now enable the windows stages
-            readYaml(file: '.ci/.jenkins_python.yml')['PYTHON_VERSION'].each { v ->
-              mapParallelTasks[v] = runScript(version: v)
+      matrix {
+        agent { label 'linux && immutable' }
+        axes {
+          axis {
+            name 'VERSION'
+            values '2.7', '3.5', '3.6', '3.7', '3.8'
+          }
+        }
+        stages {
+          stage('Test') {
+            options { skipDefaultCheckout() }
+            steps {
+              withGithubNotify(context: "Test ${VERSION}") {
+                deleteDir()
+                unstash 'source'
+                dir("${BASE_DIR}"){
+                  sh(".ci/scripts/test.sh ${VERSION}")
+                }
+              }
             }
-            parallel(mapParallelTasks)
+            post {
+              always {
+                dir("${BASE_DIR}"){
+                  junit(allowEmptyResults: true, keepLongStdio: true, testResults: '**/junit*.xml')
+                }
+              }
+            }
           }
         }
       }
@@ -67,29 +82,6 @@ pipeline {
   post {
     cleanup {
       notifyBuildResult()
-    }
-  }
-}
-
-def runScript(Map params = [:]){
-  return {
-    node('linux && immutable') {
-      def version = params.version
-      withGithubNotify(context: "Test ${version}") {
-        try {
-          deleteDir()
-          unstash 'source'
-          dir("${BASE_DIR}"){
-            sh(".ci/scripts/test.sh ${version}")
-          }
-        } catch(e){
-          error(e.toString())
-        } finally {
-          dir("${BASE_DIR}"){
-            junit(allowEmptyResults: true, keepLongStdio: true, testResults: '**/junit*.xml')
-          }
-        }
-      }
     }
   }
 }
