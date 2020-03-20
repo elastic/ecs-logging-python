@@ -44,6 +44,11 @@ pipeline {
         dir("${BASE_DIR}"){
           preCommit(commit: "${GIT_BASE_COMMIT}", junit: true)
         }
+        withGithubNotify(context: 'Lint') {
+          python(version: '3.7') {
+            sh('.ci/scripts/lint.sh')
+          }
+        }
       }
     }
     stage('Test') {
@@ -62,7 +67,7 @@ pipeline {
               withGithubNotify(context: "Test ${VERSION}") {
                 deleteDir()
                 unstash 'source'
-                dir("${BASE_DIR}"){
+                python(version: VERSION) {
                   sh(".ci/scripts/test.sh ${VERSION}")
                 }
               }
@@ -82,6 +87,20 @@ pipeline {
   post {
     cleanup {
       notifyBuildResult()
+    }
+  }
+}
+
+def python(Map v = [:], body) {
+  def dockerImage = "python:${v.version}"
+  // If dockerhub got issues then let's retry twice
+  retry(2) {
+    sleep 5
+    sh "docker pull ${dockerImage}"
+  }
+  docker.image(dockerImage).inside(){
+    dir("${BASE_DIR}"){
+      body()
     }
   }
 }
