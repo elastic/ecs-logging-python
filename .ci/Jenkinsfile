@@ -1,0 +1,87 @@
+#!/usr/bin/env groovy
+
+@Library('apm@current') _
+
+pipeline {
+  agent { label 'linux && immutable' }
+  environment {
+    REPO = 'ecs-logging-python'
+    BASE_DIR = "src/go.elastic.co/apm/${env.REPO}"
+    NOTIFY_TO = credentials('notify-to')
+  }
+  options {
+    timeout(time: 1, unit: 'HOURS')
+    buildDiscarder(logRotator(numToKeepStr: '20', artifactNumToKeepStr: '20', daysToKeepStr: '30'))
+    timestamps()
+    ansiColor('xterm')
+    disableResume()
+    durabilityHint('PERFORMANCE_OPTIMIZED')
+    rateLimitBuilds(throttle: [count: 60, durationName: 'hour', userBoost: true])
+    quietPeriod(10)
+  }
+  triggers {
+    issueCommentTrigger('(?i).*jenkins\\W+run\\W+(?:the\\W+)?tests(?:\\W+please)?.*')
+  }
+  stages {
+    stage('Checkout') {
+      options { skipDefaultCheckout() }
+      steps {
+        pipelineManager([ cancelPreviousRunningBuilds: [ when: 'PR' ] ])
+        deleteDir()
+        gitCheckout(basedir: "${BASE_DIR}", githubNotifyFirstTimeContributor: true)
+        stash allowEmpty: true, name: 'source', useDefaultExcludes: false
+      }
+    }
+    stage('Sanity checks') {
+      options { skipDefaultCheckout() }
+      environment {
+        HOME = "${env.WORKSPACE}"
+        PATH = "${env.HOME}/bin:${env.PATH}"
+      }
+      steps {
+        deleteDir()
+        unstash 'source'
+        dir("${BASE_DIR}"){
+          preCommit(commit: "${GIT_BASE_COMMIT}", junit: true)
+        }
+      }
+    }
+    stage('Test') {
+      matrix {
+        agent { label 'linux && immutable' }
+        axes {
+          axis {
+            name 'VERSION'
+            values '2.7', '3.5', '3.6', '3.7', '3.8'
+          }
+        }
+        stages {
+          stage('Test') {
+            options { skipDefaultCheckout() }
+            steps {
+              withGithubNotify(context: "Test ${VERSION}") {
+                deleteDir()
+                unstash 'source'
+                dir("${BASE_DIR}"){
+                  sh(".ci/scripts/test.sh ${VERSION}")
+                }
+              }
+            }
+            post {
+              always {
+                dir("${BASE_DIR}"){
+                  junit(allowEmptyResults: true, keepLongStdio: true, testResults: '**/junit*.xml')
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  post {
+    cleanup {
+      notifyBuildResult()
+    }
+  }
+}

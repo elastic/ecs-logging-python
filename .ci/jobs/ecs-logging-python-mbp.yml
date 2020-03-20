@@ -1,0 +1,5 @@
+---
+- job:
+    name: apm-agent-python/ecs-logging-python-mbp
+    display-name: ecs-logging-python
+    description: Logging formatters for the Elastic Common Schema (ECS) in Python
