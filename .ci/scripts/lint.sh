@@ -6,4 +6,4 @@ set -e
 export PATH=${HOME}/.local/bin:${PATH}
 
 python -m pip install -U nox
-nox -e lint
+nox -s lint
