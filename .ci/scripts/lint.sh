@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
 set -e
 
-echo 'TBD'
+python -m pip install -U nox
+nox -e lint

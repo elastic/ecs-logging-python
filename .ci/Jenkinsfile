@@ -74,9 +74,7 @@ pipeline {
             }
             post {
               always {
-                dir("${BASE_DIR}"){
-                  junit(allowEmptyResults: true, keepLongStdio: true, testResults: '**/junit*.xml')
-                }
+                junit(allowEmptyResults: true, keepLongStdio: true, testResults: "${BASE_DIR}/junit*.xml")
               }
             }
           }
