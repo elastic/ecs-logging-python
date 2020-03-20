@@ -86,7 +86,7 @@ pipeline {
 }
 
 def python(Map v = [:], body) {
-  def dockerImage = 'python:3.7'
+  def dockerImage = v.version.equals('2.7') ? 'python:3.7' : "python:${v.version}"
   // If dockerhub got issues then let's retry twice
   retry(2) {
     sleep 5
