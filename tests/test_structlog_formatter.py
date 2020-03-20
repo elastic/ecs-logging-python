@@ -1,7 +1,7 @@
-import io
 import ecs_logging
 import structlog
 import mock
+from .compat import StringIO
 
 
 def make_event_dict():
@@ -23,7 +23,7 @@ def test_event_dict_formatted(time):
 def test_can_be_set_as_processor(time):
     time.return_value = 1584720997.187709
 
-    stream = io.StringIO()
+    stream = StringIO()
     structlog.configure(
         processors=[ecs_logging.StructlogFormatter()],
         wrapper_class=structlog.BoundLogger,

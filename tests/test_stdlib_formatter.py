@@ -1,6 +1,6 @@
-import io
 import logging
 import ecs_logging
+from .compat import StringIO
 
 
 def make_record():
@@ -45,7 +45,7 @@ def test_can_be_overridden():
 
 
 def test_can_be_set_on_handler():
-    stream = io.StringIO()
+    stream = StringIO()
     handler = logging.StreamHandler(stream)
     handler.setFormatter(ecs_logging.StdlibFormatter())
 
