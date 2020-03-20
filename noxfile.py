@@ -31,4 +31,4 @@ def blacken(session):
 def lint(session):
     session.install("flake8", "black")
     session.run("black", "--check", "--target-version=py27", *SOURCE_FILES)
-    session.run("flake8", "--ignore=E501", *SOURCE_FILES)
+    session.run("flake8", "--ignore=E501,W503", *SOURCE_FILES)
