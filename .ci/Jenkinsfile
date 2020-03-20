@@ -32,19 +32,15 @@ pipeline {
         stash allowEmpty: true, name: 'source', useDefaultExcludes: false
       }
     }
-    stage('Sanity checks') {
+    stage('Lint') {
       options { skipDefaultCheckout() }
-      environment {
-        HOME = "${env.WORKSPACE}"
-        PATH = "${env.HOME}/bin:${env.PATH}"
-      }
       steps {
-        deleteDir()
-        unstash 'source'
-        dir("${BASE_DIR}"){
-          preCommit(commit: "${GIT_BASE_COMMIT}", junit: true)
-        }
         withGithubNotify(context: 'Lint') {
+          deleteDir()
+          unstash 'source'
+          dir("${BASE_DIR}"){
+            preCommit(commit: "${GIT_BASE_COMMIT}", junit: true)
+          }
           python(version: '3.7') {
             sh('.ci/scripts/lint.sh')
           }
