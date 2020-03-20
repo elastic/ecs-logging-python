@@ -1,8 +1,10 @@
 import logging
 import time
-import json
 from ._meta import ECS_VERSION
-from ._utils import deepmerge, de_dot
+from ._utils import merge_dicts, de_dot, json_dumps, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing import Any, Dict
 
 
 class StdlibFormatter(logging.Formatter):
@@ -16,18 +18,19 @@ class StdlibFormatter(logging.Formatter):
         "message": "log.original",
         "name": "log.logger",
     }
+    converter = time.gmtime
 
     def __init__(self):
+        # type: () -> None
         super(StdlibFormatter, self).__init__()
-        self.converter = time.gmtime
 
     def format(self, record):
         # type: (logging.LogRecord) -> str
         result = self.format_to_ecs(record)
-        return json.dumps(result, sort_keys=True, separators=(",", ":"))
+        return json_dumps(result)
 
     def format_to_ecs(self, record):
-        # type: (logging.LogRecord) -> dict
+        # type: (logging.LogRecord) -> Dict[str, Any]
         """Function that can be overridden to add additional fields
         to the JSON before being dumped into a string.
         """
@@ -45,7 +48,7 @@ class StdlibFormatter(logging.Formatter):
         available["message"] = record.getMessage()
 
         for attribute in set(self.WANTED_ATTRS).intersection(available):
-            deepmerge(
+            merge_dicts(
                 de_dot(self.WANTED_ATTRS[attribute], getattr(record, attribute)), result
             )
 
