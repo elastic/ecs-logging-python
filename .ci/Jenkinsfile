@@ -93,11 +93,8 @@ def python(Map v = [:], body) {
     sh "docker pull ${dockerImage}"
   }
   docker.image(dockerImage).inside("-e HOME=${env.WORKSPACE}"){
-    // To support build running on docker as the tools are stored in that location
-    withEnv(['PATH+MAVEN=${HOME}/.local/bin']) {
-      dir("${BASE_DIR}"){
-        body()
-      }
+    dir("${BASE_DIR}"){
+      body()
     }
   }
 }
