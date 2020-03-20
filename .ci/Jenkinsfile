@@ -32,17 +32,18 @@ pipeline {
         stash allowEmpty: true, name: 'source', useDefaultExcludes: false
       }
     }
-    stage('Sanity checks') {
+    stage('Lint') {
       options { skipDefaultCheckout() }
-      environment {
-        HOME = "${env.WORKSPACE}"
-        PATH = "${env.HOME}/bin:${env.PATH}"
-      }
       steps {
-        deleteDir()
-        unstash 'source'
-        dir("${BASE_DIR}"){
-          preCommit(commit: "${GIT_BASE_COMMIT}", junit: true)
+        withGithubNotify(context: 'Lint') {
+          deleteDir()
+          unstash 'source'
+          dir("${BASE_DIR}"){
+            preCommit(commit: "${GIT_BASE_COMMIT}", junit: true)
+          }
+          python(version: '3.7') {
+            sh('.ci/scripts/lint.sh')
+          }
         }
       }
     }
@@ -62,16 +63,14 @@ pipeline {
               withGithubNotify(context: "Test ${VERSION}") {
                 deleteDir()
                 unstash 'source'
-                dir("${BASE_DIR}"){
+                python(version: VERSION) {
                   sh(".ci/scripts/test.sh ${VERSION}")
                 }
               }
             }
             post {
               always {
-                dir("${BASE_DIR}"){
-                  junit(allowEmptyResults: true, keepLongStdio: true, testResults: '**/junit*.xml')
-                }
+                junit(allowEmptyResults: true, keepLongStdio: true, testResults: "${BASE_DIR}/junit*.xml")
               }
             }
           }
@@ -82,6 +81,20 @@ pipeline {
   post {
     cleanup {
       notifyBuildResult()
+    }
+  }
+}
+
+def python(Map v = [:], body) {
+  def dockerImage = v.version.equals('2.7') ? 'python:3.7' : "python:${v.version}"
+  // If dockerhub got issues then let's retry twice
+  retry(2) {
+    sleep 5
+    sh "docker pull ${dockerImage}"
+  }
+  docker.image(dockerImage).inside("-e HOME=${env.WORKSPACE}"){
+    dir("${BASE_DIR}"){
+      body()
     }
   }
 }

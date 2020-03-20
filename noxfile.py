@@ -8,6 +8,7 @@ def tests_impl(session):
     session.install(".[develop]")
     session.run(
         "pytest",
+        "--junitxml=junit-test.xml",
         *(session.posargs or ("tests/",)),
         env={"PYTHONWARNINGS": "always::DeprecationWarning"}
     )
