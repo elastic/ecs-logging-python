@@ -95,6 +95,7 @@ def python(Map v = [:], body) {
   docker.image(dockerImage).inside("-e HOME=${env.WORKSPACE}"){
     // To support build running on docker as the tools are stored in that location
     withEnv(['PATH+MAVEN=${HOME}/.local/bin']) {
+      sh 'env | sort'
       dir("${BASE_DIR}"){
         body()
       }
