@@ -9,6 +9,7 @@ if TYPE_CHECKING:
 
 class StructlogFormatter:
     """ECS formatter for the ``structlog`` module"""
+
     def __call__(self, _, name, event_dict):
         # type: (Any, str, Dict[str, Any]) -> str
         event_dict = normalize_dict(event_dict)
@@ -20,6 +21,11 @@ class StructlogFormatter:
         # type: (Dict[str, Any]) -> Dict[str, Any]
         event_dict["message"] = event_dict.pop("event")
         if "@timestamp" not in event_dict:
-            event_dict["@timestamp"] = datetime.datetime.utcfromtimestamp(time.time()).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
+            event_dict["@timestamp"] = (
+                datetime.datetime.utcfromtimestamp(time.time()).strftime(
+                    "%Y-%m-%dT%H:%M:%S.%f"
+                )[:-3]
+                + "Z"
+            )
         event_dict.setdefault("ecs", {}).setdefault("version", ECS_VERSION)
         return event_dict

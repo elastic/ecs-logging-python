@@ -1,6 +1,8 @@
 import json
+
 try:
     import typing
+
     TYPE_CHECKING = typing.TYPE_CHECKING
 except ImportError:
     typing = None  # type: ignore

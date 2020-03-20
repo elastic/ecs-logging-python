@@ -5,10 +5,7 @@ import mock
 
 
 def make_event_dict():
-    return {
-        "event": "test message",
-        "log.logger": "logger-name"
-    }
+    return {"event": "test message", "log.logger": "logger-name"}
 
 
 @mock.patch("time.time")
@@ -28,12 +25,10 @@ def test_can_be_set_as_processor(time):
 
     stream = io.StringIO()
     structlog.configure(
-        processors=[
-            ecs_logging.StructlogFormatter()
-        ],
+        processors=[ecs_logging.StructlogFormatter()],
         wrapper_class=structlog.BoundLogger,
         context_class=dict,
-        logger_factory=structlog.PrintLoggerFactory(stream)
+        logger_factory=structlog.PrintLoggerFactory(stream),
     )
 
     logger = structlog.get_logger("logger-name")
