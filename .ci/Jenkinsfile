@@ -92,7 +92,7 @@ def python(Map v = [:], body) {
     sleep 5
     sh "docker pull ${dockerImage}"
   }
-  docker.image(dockerImage).inside(){
+  docker.image(dockerImage).inside("-e HOME=${env.WORKSPACE}"){
     dir("${BASE_DIR}"){
       body()
     }
