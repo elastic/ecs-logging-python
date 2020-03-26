@@ -84,22 +84,54 @@ structlog.configure(
 logger = structlog.get_logger("app")
 
 # Add additional context
-logger = logger.bind(**{"log.logger": "app"})
+logger = logger.bind(**{
+    "http": {
+        "version": "2",
+        "request": {
+            "method": "get",
+            "bytes": 1337,
+        },
+    },
+    "url": {
+        "domain": "example.com",
+        "path": "/",
+        "port": 443,
+        "scheme": "https",
+        "registered_domain": "example.com",
+        "top_level_domain": "com",
+        "original": "https://example.com",
+    }
+})
 
 # Emit a log!
 logger.debug("Example message!")
 ```
 ```json
 {
-    "@timestamp": "2020-03-20T18:10:32.972Z",
-    "ecs": {
-        "version": "1.5.0"
+  "@timestamp": "2020-03-26T13:08:11.728Z",
+  "ecs": {
+    "version": "1.5.0"
+  },
+  "http": {
+    "request": {
+      "bytes": 1337,
+      "method": "get"
     },
-    "log": {
-        "level": "debug",
-        "logger": "app"
-    },
-    "message": "Example message!"
+    "version": "2"
+  },
+  "log": {
+    "level": "debug"
+  },
+  "message": "Example message!",
+  "url": {
+    "domain": "example.com",
+    "original": "https://example.com",
+    "path": "/",
+    "port": 443,
+    "registered_domain": "example.com",
+    "scheme": "https",
+    "top_level_domain": "com"
+  }
 }
 ```
 

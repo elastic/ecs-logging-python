@@ -30,3 +30,10 @@ develop = [
     "mock",
     "structlog",
 ]
+
+[tool.flit.metadata.urls]
+"Source" = "https://github.com/elastic/ecs-logging-python"
+"Download" = "https://github.com/elastic/ecs-logging-python/releases"
+"Documentation" = "https://github.com/elastic/ecs-logging-python"
+"Issue Tracker" = "https://github.com/elastic/ecs-logging-python/issues"
+"Changelog" = "https://github.com/elastic/ecs-logging-python/blob/master/CHANGELOG.md"
