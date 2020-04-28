@@ -42,7 +42,7 @@ handler.setFormatter(ecs_logging.StdlibFormatter())
 logger.addHandler(handler)
 
 # Emit a log!
-logger.debug("Example message!")
+logger.debug("Example message!", extra={"http.request.method": "get"})
 ```
 ```json
 {
@@ -50,8 +50,13 @@ logger.debug("Example message!")
     "ecs": {
         "version": "1.5.0"
     },
+    "http": {
+      "request": {
+        "method": "get"
+      }
+    },
     "log": {
-        "level": "DEBUG",
+        "level": "debug",
         "logger": "app",
         "origin": {
             "file": {

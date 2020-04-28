@@ -1,4 +1,5 @@
 import logging
+import mock
 import ecs_logging
 from .compat import StringIO
 
@@ -24,7 +25,7 @@ def test_record_formatted():
 
     assert formatter.format(make_record()) == (
         '{"@timestamp":"2020-03-20T14:12:46.123Z","ecs":{"version":"1.5.0"},'
-        '"log":{"level":"DEBUG","logger":"logger-name","origin":{"file":{"line":10,"name":"file.py"},'
+        '"log":{"level":"debug","logger":"logger-name","origin":{"file":{"line":10,"name":"file.py"},'
         '"function":"test_function"},"original":"1: hello"},"message":"1: hello"}'
     )
 
@@ -39,7 +40,7 @@ def test_can_be_overridden():
     formatter = CustomFormatter()
     assert formatter.format(make_record()) == (
         '{"@timestamp":"2020-03-20T14:12:46.123Z","custom":"field","ecs":{"version":"1.5.0"},'
-        '"log":{"level":"DEBUG","logger":"logger-name","origin":{"file":{"line":10,"name":"file.py"},'
+        '"log":{"level":"debug","logger":"logger-name","origin":{"file":{"line":10,"name":"file.py"},'
         '"function":"test_function"},"original":"1: hello"},"message":"1: hello"}'
     )
 
@@ -53,6 +54,27 @@ def test_can_be_set_on_handler():
 
     assert stream.getvalue() == (
         '{"@timestamp":"2020-03-20T14:12:46.123Z","ecs":{"version":"1.5.0"},'
-        '"log":{"level":"DEBUG","logger":"logger-name","origin":{"file":{"line":10,"name":"file.py"},'
+        '"log":{"level":"debug","logger":"logger-name","origin":{"file":{"line":10,"name":"file.py"},'
         '"function":"test_function"},"original":"1: hello"},"message":"1: hello"}\n'
+    )
+
+
+@mock.patch("time.time")
+def test_extra_is_merged(time):
+    time.return_value = 1584720997.187709
+
+    stream = StringIO()
+    handler = logging.StreamHandler(stream)
+    handler.setFormatter(ecs_logging.StdlibFormatter())
+    logger = logging.getLogger("test-logger")
+    logger.addHandler(handler)
+    logger.setLevel(logging.INFO)
+
+    logger.info("hey world", extra={"tls": {"cipher": "AES"}, "tls.established": True})
+
+    assert stream.getvalue() == (
+        '{"@timestamp":"2020-03-20T16:16:37.187Z","ecs":{"version":"1.5.0"},"log":'
+        '{"level":"info","logger":"test-logger","origin":{"file":{"line":73,"name":'
+        '"test_stdlib_formatter.py"},"function":"test_extra_is_merged"},"original":"hey '
+        'world"},"message":"hey world","tls":{"cipher":"AES","established":true}}\n'
     )

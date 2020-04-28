@@ -13,7 +13,7 @@ class StructlogFormatter:
     def __call__(self, _, name, event_dict):
         # type: (Any, str, Dict[str, Any]) -> str
         event_dict = normalize_dict(event_dict)
-        event_dict.setdefault("log", {}).setdefault("level", name)
+        event_dict.setdefault("log", {}).setdefault("level", name.lower())
         event_dict = self.format_to_ecs(event_dict)
         return json_dumps(event_dict)
 

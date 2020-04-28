@@ -18,6 +18,28 @@ class StdlibFormatter(logging.Formatter):
         "message": "log.original",
         "name": "log.logger",
     }
+    LOGRECORD_DICT = {
+        "name",
+        "msg",
+        "args",
+        "levelname",
+        "levelno",
+        "pathname",
+        "filename",
+        "module",
+        "exc_info",
+        "exc_text",
+        "stack_info",
+        "lineno",
+        "funcName",
+        "created",
+        "msecs",
+        "relativeCreated",
+        "thread",
+        "threadName",
+        "processName",
+        "process",
+    }
     converter = time.gmtime
 
     def __init__(self):
@@ -48,9 +70,15 @@ class StdlibFormatter(logging.Formatter):
         available["message"] = record.getMessage()
 
         for attribute in set(self.WANTED_ATTRS).intersection(available):
-            merge_dicts(
-                de_dot(self.WANTED_ATTRS[attribute], getattr(record, attribute)), result
-            )
+            ecs_attr = self.WANTED_ATTRS[attribute]
+            value = getattr(record, attribute)
+            if ecs_attr == "log.level" and isinstance(value, str):
+                value = value.lower()
+            merge_dicts(de_dot(ecs_attr, value), result)
+
+        # Merge in any keys that were set within 'extra={...}'
+        for key in set(available.keys()).difference(self.LOGRECORD_DICT):
+            merge_dicts(de_dot(key, available[key]), result)
 
         # The following is mostly for the ecs format. You can't have 2x
         # 'message' keys in WANTED_ATTRS, so we set the value to
