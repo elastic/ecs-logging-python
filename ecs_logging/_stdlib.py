@@ -1,5 +1,6 @@
 import logging
 import time
+from traceback import format_tb
 from ._meta import ECS_VERSION
 from ._utils import merge_dicts, de_dot, json_dumps, TYPE_CHECKING
 
@@ -42,9 +43,24 @@ class StdlibFormatter(logging.Formatter):
     }
     converter = time.gmtime
 
-    def __init__(self):
-        # type: () -> None
+    def __init__(self, include_exc_info=False, stack_trace_limit=0):
+        """Initialize the ECS formatter.
+
+        Parameters
+        ----------
+        include_exc_info : bool
+          Specifies whether to include exception information in the
+          generated log structure. Defaults to `False`.
+        stack_trace_limit : int
+          Specifies how many frames to include for stack traces. Defaults
+          to zero (do not include exception information). Setting this
+          parameter to `None` includes all available frames in stack
+          traces.
+        """
+        # type: (bool, int) -> None
         super(StdlibFormatter, self).__init__()
+        self._include_exc_info = include_exc_info
+        self._stack_trace_limit = stack_trace_limit
 
     def format(self, record):
         # type: (logging.LogRecord) -> str
@@ -76,6 +92,16 @@ class StdlibFormatter(logging.Formatter):
                 value = value.lower()
             merge_dicts(de_dot(ecs_attr, value), result)
 
+        if self._include_exc_info and record.exc_info is not None:
+            cls, exn, tb = record.exc_info
+            if cls is not None:
+                merge_dicts(de_dot("error.type", cls.__name__), result)
+            if exn is not None:
+                merge_dicts(de_dot("error.message", str(exn)), result)
+            if tb is not None and self._stack_trace_limit != 0:
+                trace = ''.join(format_tb(tb, limit=self._stack_trace_limit))
+                merge_dicts(de_dot("error.stack_trace", trace), result)
+            
         # Merge in any keys that were set within 'extra={...}'
         for key in set(available.keys()).difference(self.LOGRECORD_DICT):
             merge_dicts(de_dot(key, available[key]), result)

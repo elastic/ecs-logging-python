@@ -1,4 +1,7 @@
 import logging
+import json
+import re
+import sys
 import mock
 import ecs_logging
 from .compat import StringIO
@@ -58,7 +61,6 @@ def test_can_be_set_on_handler():
         '"function":"test_function"},"original":"1: hello"},"message":"1: hello"}\n'
     )
 
-
 @mock.patch("time.time")
 def test_extra_is_merged(time):
     time.return_value = 1584720997.187709
@@ -74,7 +76,55 @@ def test_extra_is_merged(time):
 
     assert stream.getvalue() == (
         '{"@timestamp":"2020-03-20T16:16:37.187Z","ecs":{"version":"1.5.0"},"log":'
-        '{"level":"info","logger":"test-logger","origin":{"file":{"line":73,"name":'
+        '{"level":"info","logger":"test-logger","origin":{"file":{"line":75,"name":'
         '"test_stdlib_formatter.py"},"function":"test_extra_is_merged"},"original":"hey '
         'world"},"message":"hey world","tls":{"cipher":"AES","established":true}}\n'
     )
+
+def test_can_log_exception_info():
+    formatter = ecs_logging.StdlibFormatter(include_exc_info=True)
+    record = make_record()
+    try:
+        raise Exception("msg")
+    except:
+        record.exc_info = sys.exc_info()
+        
+    assert formatter.format(record) == (
+        '{"@timestamp":"2020-03-20T14:12:46.123Z","ecs":{"version":"1.5.0"},'
+        '"error":{"message":"msg","type":"Exception"},'
+        '"log":{"level":"debug","logger":"logger-name","origin":{"file":{"line":10,"name":"file.py"},'
+        '"function":"test_function"},"original":"1: hello"},"message":"1: hello"}'
+    )
+
+def test_can_include_stack_traces():
+    formatter = ecs_logging.StdlibFormatter(include_exc_info=True,
+                                            stack_trace_limit=None)
+    record = make_record()
+
+    try:
+        raise Exception("msg")
+    except:
+        record.exc_info = sys.exc_info()
+
+    result = json.loads(formatter.format(record))
+    trace_lines = result['error']['stack_trace'].split('\n')
+    assert re.search("^\\s+File \\\"\\S+ecs-logging-python/tests/test_stdlib_formatter.py\\\", line 105, in test_can_include_stack_traces$", trace_lines[0]) is not None
+    assert trace_lines[1] == '    raise Exception("msg")'
+
+def _generate_exception():
+    raise Exception("msg")
+
+def test_can_limit_stack_traces():
+    formatter = ecs_logging.StdlibFormatter(include_exc_info=True,
+                                            stack_trace_limit=1)
+    record = make_record()
+
+    try:
+        _generate_exception()
+    except:
+        record.exc_info = sys.exc_info()
+
+    result = json.loads(formatter.format(record))
+    # resulting stack trace should just have 2 lines (i.e. 1 frame)
+    assert 2 == len(result['error']['stack_trace'].strip().split('\n'))
+    
