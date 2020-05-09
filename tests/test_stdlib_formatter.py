@@ -127,4 +127,3 @@ def test_can_limit_stack_traces():
     result = json.loads(formatter.format(record))
     # resulting stack trace should just have 2 lines (i.e. 1 frame)
     assert 2 == len(result['error']['stack_trace'].strip().split('\n'))
-    
