@@ -1,3 +1,8 @@
+try:
+    from collections.abc import Sequence as Seq
+except AttributeError:
+    from collections import Sequence as Seq
+
 import logging
 import time
 from traceback import format_tb
@@ -5,24 +10,17 @@ from ._meta import ECS_VERSION
 from ._utils import merge_dicts, de_dot, json_dumps, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import Any, Dict
+    from typing import Any, Callable, Dict, Sequence
 
 
 class StdlibFormatter(logging.Formatter):
     """ECS Formatter for the standard library ``logging`` module"""
 
-    WANTED_ATTRS = {
-        "levelname": "log.level",
-        "funcName": "log.origin.function",
-        "lineno": "log.origin.file.line",
-        "filename": "log.origin.file.name",
-        "message": "log.original",
-        "name": "log.logger",
-    }
-    LOGRECORD_DICT = {
+    _LOGRECORD_DICT = {
         "name",
         "msg",
         "args",
+        "asctime",
         "levelname",
         "levelno",
         "pathname",
@@ -40,26 +38,37 @@ class StdlibFormatter(logging.Formatter):
         "threadName",
         "processName",
         "process",
+        "message",
     }
     converter = time.gmtime
 
-    def __init__(self, include_exc_info=False, stack_trace_limit=0):
+    def __init__(self, stack_trace_limit=None, exclude_keys=[]):
+        # type: (Any, Sequence[str]) -> None
         """Initialize the ECS formatter.
 
         Parameters
         ----------
-        include_exc_info : bool
-          Specifies whether to include exception information in the
-          generated log structure. Defaults to `False`.
         stack_trace_limit : int
-          Specifies how many frames to include for stack traces. Defaults
-          to zero (do not include exception information). Setting this
-          parameter to `None` includes all available frames in stack
-          traces.
+          Specifies the maximum number of frames to include for stack
+          traces. Defaults to `None`, which includes all available frames.
+          Setting this to zero will suppress stack traces.
+        exclude_keys : Sequence[str]
+          Specifies any fields that should be suppressed from the resulting
+          fields, expressed with dot notation. For example:
+          `exclude_keys=["error.stack_trace"]`
         """
-        # type: (bool, int) -> None
         super(StdlibFormatter, self).__init__()
-        self._include_exc_info = include_exc_info
+        if stack_trace_limit is not None and (
+            type(stack_trace_limit) != int or stack_trace_limit < 0
+        ):
+            raise ValueError(
+                "stack_trace_limit must be None, or a non-negative integer"
+            )
+        if not isinstance(exclude_keys, Seq) or list(
+            filter(lambda x: type(x) != str, exclude_keys)
+        ):
+            raise ValueError("exclude_keys must be a sequence of strings")
+        self._exclude_keys = exclude_keys
         self._stack_trace_limit = stack_trace_limit
 
     def format(self, record):
@@ -69,14 +78,51 @@ class StdlibFormatter(logging.Formatter):
 
     def format_to_ecs(self, record):
         # type: (logging.LogRecord) -> Dict[str, Any]
-        """Function that can be overridden to add additional fields
-        to the JSON before being dumped into a string.
+        """Function that can be overridden to add additional fields to
+        (or remove fields from) the JSON before being dumped into a string.
+        Example:
+          class MyFormatter(StdlibFormatter):
+            def format_to_ecs(self, record):
+              result = super().format_to_ecs(record)
+              del result["log"]["original"]   # remove unwanted field(s)
+              result["my_field"] = "my_value" # add custom field
+              return result
         """
-        timestamp = "%s.%03dZ" % (
-            self.formatTime(record, datefmt="%Y-%m-%dT%H:%M:%S"),
-            record.msecs,
-        )
-        result = {"@timestamp": timestamp, "ecs": {"version": ECS_VERSION}}
+
+        extractors = {
+            "@timestamp": lambda r: self._format_timestamp(r),
+            "ecs.version": lambda _: ECS_VERSION,
+            "log.level": lambda r: (r.levelname.lower() if r.levelname else None),
+            "log.origin.function": self._record_attribute("funcName"),
+            "log.origin.file.line": self._record_attribute("lineno"),
+            "log.origin.file.name": self._record_attribute("filename"),
+            "log.original": lambda r: r.getMessage(),
+            "log.logger": self._record_attribute("name"),
+            "process.pid": self._record_attribute("process"),
+            "process.name": self._record_attribute("processName"),
+            "process.thread.id": self._record_attribute("thread"),
+            "process.thread.name": self._record_attribute("threadName"),
+            "error.type": lambda r: (
+                r.exc_info[0].__name__
+                if (r.exc_info is not None and r.exc_info[0] is not None)
+                else None
+            ),
+            "error.message": lambda r: (
+                str(r.exc_info[1]) if r.exc_info and r.exc_info[1] else None
+            ),
+            "error.stack_trace": lambda r: (
+                "".join(format_tb(r.exc_info[2], limit=self._stack_trace_limit))
+                if r.exc_info and r.exc_info[2]
+                else None
+            ),
+        }  # type: Dict[str, Callable[[logging.LogRecord],Any]]
+
+        result = {}  # type: Dict[str,Any]
+        for key in set(extractors.keys()).difference(self._exclude_keys):
+            value = extractors[key](record)
+            if value is not None:
+                merge_dicts(de_dot(key, value), result)
+
         available = record.__dict__
 
         # This is cleverness because 'message' is NOT a member
@@ -85,30 +131,25 @@ class StdlibFormatter(logging.Formatter):
         # adding 'message' to ``available``, it simplifies the code
         available["message"] = record.getMessage()
 
-        for attribute in set(self.WANTED_ATTRS).intersection(available):
-            ecs_attr = self.WANTED_ATTRS[attribute]
-            value = getattr(record, attribute)
-            if ecs_attr == "log.level" and isinstance(value, str):
-                value = value.lower()
-            merge_dicts(de_dot(ecs_attr, value), result)
-
-        if self._include_exc_info and record.exc_info is not None:
-            cls, exn, tb = record.exc_info
-            if cls is not None:
-                merge_dicts(de_dot("error.type", cls.__name__), result)
-            if exn is not None:
-                merge_dicts(de_dot("error.message", str(exn)), result)
-            if tb is not None and self._stack_trace_limit != 0:
-                trace = ''.join(format_tb(tb, limit=self._stack_trace_limit))
-                merge_dicts(de_dot("error.stack_trace", trace), result)
-            
+        extras = set(available).difference(self._LOGRECORD_DICT)
         # Merge in any keys that were set within 'extra={...}'
-        for key in set(available.keys()).difference(self.LOGRECORD_DICT):
+        for key in extras:
             merge_dicts(de_dot(key, available[key]), result)
 
         # The following is mostly for the ecs format. You can't have 2x
-        # 'message' keys in WANTED_ATTRS, so we set the value to
+        # 'message' keys in _WANTED_ATTRS, so we set the value to
         # 'log.original' in ecs, and this code block guarantees it
         # still appears as 'message' too.
         result.setdefault("message", available["message"])
         return result
+
+    def _format_timestamp(self, record):
+        # type: (logging.LogRecord) -> str
+        return "%s.%03dZ" % (
+            self.formatTime(record, datefmt="%Y-%m-%dT%H:%M:%S"),
+            record.msecs,
+        )
+
+    def _record_attribute(self, attribute):
+        # type: (str) -> Callable[[logging.LogRecord],Any]
+        return lambda r: getattr(r, attribute, None)
