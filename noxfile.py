@@ -9,6 +9,7 @@ def tests_impl(session):
     session.run(
         "pytest",
         "--junitxml=junit-test.xml",
+        "--cov=ecs_logging",
         *(session.posargs or ("tests/",)),
         env={"PYTHONWARNINGS": "always::DeprecationWarning"}
     )
