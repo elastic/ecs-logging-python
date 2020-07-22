@@ -11,6 +11,28 @@ except ImportError:
 if TYPE_CHECKING:
     from typing import Any, Dict
 
+try:
+    import collections.abc as collections_abc
+except ImportError:
+    import collections as collections_abc  # type: ignore
+
+try:
+    from functools import lru_cache
+except ImportError:
+    from backports.functools_lru_cache import lru_cache  # type: ignore
+
+
+__all__ = [
+    "collections_abc",
+    "normalize_dict",
+    "de_dot",
+    "merge_dicts",
+    "json_dumps",
+    "TYPE_CHECKING",
+    "typing",
+    "lru_cache",
+]
+
 
 def normalize_dict(value):
     # type: (Dict[str, Any]) -> Dict[str, Any]
