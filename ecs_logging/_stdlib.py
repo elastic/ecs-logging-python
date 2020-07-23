@@ -9,6 +9,7 @@ from ._utils import (
     TYPE_CHECKING,
     collections_abc,
     lru_cache,
+    flatten_dict,
 )
 
 if TYPE_CHECKING:
@@ -152,12 +153,16 @@ class StdlibFormatter(logging.Formatter):
         # adding 'message' to ``available``, it simplifies the code
         available["message"] = record.getMessage()
 
-        extras = set(available).difference(self._LOGRECORD_DICT)
+        # Pull all extras and flatten them to be sent into '_is_field_excluded'
+        # since they can be defined as 'extras={"http": {"method": "GET"}}'
+        extra_keys = set(available).difference(self._LOGRECORD_DICT)
+        extras = flatten_dict({key: available[key] for key in extra_keys})
+
         # Merge in any keys that were set within 'extra={...}'
-        for field in extras:
+        for field, value in extras.items():
             if self._is_field_excluded(field):
                 continue
-            merge_dicts(de_dot(field, available[field]), result)
+            merge_dicts(de_dot(field, value), result)
 
         # The following is mostly for the ecs format. You can't have 2x
         # 'message' keys in _WANTED_ATTRS, so we set the value to
