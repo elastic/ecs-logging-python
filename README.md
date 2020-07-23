@@ -26,7 +26,7 @@ $ python -m pip install ecs-logging
 [`logging`](https://docs.python.org/3/library/logging.html) module
 and the [`structlog`](https://www.structlog.org/en/stable/) package.
 
-### Logging Example
+## Standard Library `logging` Module
 
 ```python
 import logging
@@ -111,7 +111,7 @@ formatter = StdlibFormatter(
 )
 ```
 
-### Structlog Example
+## Structlog Example
 
 ```python
 import structlog
@@ -179,6 +179,12 @@ logger.debug("Example message!")
   }
 }
 ```
+
+## Elastic APM Log Correlation
+
+`ecs-logging-python` supports automatically collecting [ECS tracing fields](https://www.elastic.co/guide/en/ecs/master/ecs-tracing.html)
+from the [Elastic APM Python agent](https://github.com/elastic/apm-agent-python) in order to
+[correlate logs to spans, transactions and traces](https://www.elastic.co/guide/en/apm/agent/python/current/log-correlation.html) in Elastic APM.
 
 ## License
 
