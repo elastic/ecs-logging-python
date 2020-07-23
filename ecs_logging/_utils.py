@@ -34,6 +34,33 @@ __all__ = [
 ]
 
 
+def flatten_dict(value):
+    # type: (typing.Mapping[str, Any]) -> Dict[str, Any]
+    """Adds dots to all nested fields in dictionaries.
+    Raises an error if there are entries which are represented
+    with different forms of nesting. (ie {"a": {"b": 1}, "a.b": 2})
+    """
+    top_level = {}
+    for key, val in value.items():
+        if not isinstance(val, collections_abc.Mapping):
+            if key in top_level:
+                raise ValueError(
+                    "Duplicate entry for '%s' with different nesting" % key
+                )
+            top_level[key] = val
+        else:
+            val = flatten_dict(val)
+            for vkey, vval in val.items():
+                vkey = "%s.%s" % (key, vkey)
+                if vkey in top_level:
+                    raise ValueError(
+                        "Duplicate entry for '%s' with different nesting" % vkey
+                    )
+                top_level[vkey] = vval
+
+    return top_level
+
+
 def normalize_dict(value):
     # type: (Dict[str, Any]) -> Dict[str, Any]
     """Expands all dotted names to nested dictionaries"""

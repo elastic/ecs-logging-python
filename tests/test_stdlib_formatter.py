@@ -83,7 +83,10 @@ def test_extra_is_merged(time, logger):
     logger.info(
         "hey world",
         extra={
-            "tls": {"cipher": "AES"},
+            "tls": {
+                "cipher": "AES",
+                "client": {"hash": {"md5": "0F76C7F2C55BFD7D8E8B8F4BFBF0C9EC"}},
+            },
             "tls.established": True,
             "tls.client.certificate": "cert",
         },
