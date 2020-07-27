@@ -17,7 +17,7 @@ we will be following (ECS.major).(ECS.minor).(package minor) as our versioning s
 ## Installation
 
 ```console
-python -m pip install ecs-logging
+$ python -m pip install ecs-logging
 ```
 
 ## Getting Started
@@ -69,6 +69,46 @@ logger.debug("Example message!", extra={"http.request.method": "get"})
     },
     "message": "Example message!"
 }
+```
+
+##### Excluding Fields
+
+You can exclude fields from being collected by using the `exclude_fields` option
+in the `StdlibFormatter` constructor:
+
+```python
+from ecs_logging import StdlibFormatter
+
+formatter = StdlibFormatter(
+    exclude_fields=[
+        # You can specify individual fields to ignore:
+        "log.original",
+        # or you can also use prefixes to ignore
+        # whole categories of fields:
+        "process",
+        "log.origin",
+    ]
+)
+```
+
+##### Limiting Stack Traces
+
+The `StdlibLogger` automatically gathers `exc_info` into ECS `error.*` fields.
+If you'd like to control the number of stack frames that are included
+in `error.stack_trace` you can use the `stack_trace_limit` parameter
+(by default all frames are collected):
+
+```python
+from ecs_logging import StdlibFormatter
+
+formatter = StdlibFormatter(
+    # Only collects 3 stack frames
+    stack_trace_limit=3,
+)
+formatter = StdlibFormatter(
+    # Disable stack trace collection
+    stack_trace_limit=0,
+)
 ```
 
 ### Structlog Example
