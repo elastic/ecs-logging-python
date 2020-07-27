@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.3 (2020-07-27)
+
+- Added collecting `LogRecord.exc_info` into `error.*` fields
+  automatically for `StdlibFormatter` ([#16](https://github.com/elastic/ecs-logging-python/pull/16))
+- Added collecting process and thread info from `LogRecord` into `process.*` fields
+  automatically for `StdlibFormatter` ([#16](https://github.com/elastic/ecs-logging-python/pull/16))
+- Added `exclude_fields` parameter to `StdlibFormatter` to
+  exclude fields from being formatted to JSON ([#16](https://github.com/elastic/ecs-logging-python/pull/16))
+- Added `stack_trace_limit` parameter to `StdlibFormatter`
+  to control the number of stack trace frames being
+  formatted in `error.stack_trace` ([#16](https://github.com/elastic/ecs-logging-python/pull/16))
+
+Thanks to community contributor Jon Moore ([@comcast-jonm](https://github.com/comcast-jonm))
+for their contributions to this release.
+
 ## 0.2 (2020-04-28)
 
 - Added support for using `log(..., extra={...})` on standard library
