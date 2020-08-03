@@ -158,9 +158,17 @@ class StdlibFormatter(logging.Formatter):
         extra_keys = set(available).difference(self._LOGRECORD_DICT)
         extras = flatten_dict({key: available[key] for key in extra_keys})
 
+        # Pop all Elastic APM extras and add them
+        # to standard tracing ECS fields.
+        extras["span.id"] = extras.pop("elasticapm_span_id", None)
+        extras["transaction.id"] = extras.pop("elasticapm_transaction_id", None)
+        extras["trace.id"] = extras.pop("elasticapm_trace_id", None)
+
         # Merge in any keys that were set within 'extra={...}'
         for field, value in extras.items():
-            if self._is_field_excluded(field):
+            if field.startswith("elasticapm_labels."):
+                continue  # Unconditionally remove, we don't need this info.
+            if value is None or self._is_field_excluded(field):
                 continue
             merge_dicts(de_dot(field, value), result)
 
