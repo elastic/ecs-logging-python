@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4 (2020-08-04)
+
+- Added automatic collection of ECS fields `trace.id`, `span.id`, and `transaction.id` for
+  [Log Correlation](https://www.elastic.co/guide/en/apm/agent/python/master/log-correlation.html) with
+  the Python Elastic APM agent ([#17](https://github.com/elastic/ecs-logging-python/pull/17))
+
 ## 0.3 (2020-07-27)
 
 - Added collecting `LogRecord.exc_info` into `error.*` fields
