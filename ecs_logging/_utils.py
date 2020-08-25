@@ -64,6 +64,8 @@ def flatten_dict(value):
 def normalize_dict(value):
     # type: (Dict[str, Any]) -> Dict[str, Any]
     """Expands all dotted names to nested dictionaries"""
+    if not isinstance(value, dict):
+        return value
     keys = list(value.keys())
     for key in keys:
         if "." in key:
