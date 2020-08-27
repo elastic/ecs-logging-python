@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.0 (2020-08-27)
+
+- Updated supported ECS version to 1.6.0 ([#24](https://github.com/elastic/ecs-logging-python/pull/24))
+- Added support for `LogRecord.stack_info` ([#23](https://github.com/elastic/ecs-logging-python/pull/23))
+- Fixed normalizing of items in `list` that aren't of type 
+  `dict` ([#22](https://github.com/elastic/ecs-logging-python/pull/22), contributed by [`@camerondavison`](https://github.com/camerondavison))
+
 ## 0.4 (2020-08-04)
 
 - Added automatic collection of ECS fields `trace.id`, `span.id`, and `transaction.id` for

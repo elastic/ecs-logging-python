@@ -39,7 +39,7 @@ def test_record_formatted():
     formatter = ecs_logging.StdlibFormatter(exclude_fields=["process"])
 
     assert formatter.format(make_record()) == (
-        '{"@timestamp":"2020-03-20T14:12:46.123Z","ecs":{"version":"1.5.0"},'
+        '{"@timestamp":"2020-03-20T14:12:46.123Z","ecs":{"version":"1.6.0"},'
         '"log":{"level":"debug","logger":"logger-name","origin":{"file":{"line":10,"name":"file.py"},'
         '"function":"test_function"},"original":"1: hello"},"message":"1: hello"}'
     )
@@ -54,7 +54,7 @@ def test_can_be_overridden():
 
     formatter = CustomFormatter(exclude_fields=["process"])
     assert formatter.format(make_record()) == (
-        '{"@timestamp":"2020-03-20T14:12:46.123Z","custom":"field","ecs":{"version":"1.5.0"},'
+        '{"@timestamp":"2020-03-20T14:12:46.123Z","custom":"field","ecs":{"version":"1.6.0"},'
         '"log":{"level":"debug","logger":"logger-name","origin":{"file":{"line":10,"name":"file.py"},'
         '"function":"test_function"},"original":"1: hello"},"message":"1: hello"}'
     )
@@ -68,7 +68,7 @@ def test_can_be_set_on_handler():
     handler.handle(make_record())
 
     assert stream.getvalue() == (
-        '{"@timestamp":"2020-03-20T14:12:46.123Z","ecs":{"version":"1.5.0"},'
+        '{"@timestamp":"2020-03-20T14:12:46.123Z","ecs":{"version":"1.6.0"},'
         '"log":{"level":"debug","logger":"logger-name","origin":{"file":{"line":10,"name":"file.py"},'
         '"function":"test_function"},"original":"1: hello"},"message":"1: hello"}\n'
     )
@@ -102,7 +102,7 @@ def test_extra_is_merged(time, logger):
     assert isinstance(ecs["log"]["origin"]["file"].pop("line"), int)
     assert ecs == {
         "@timestamp": "2020-03-20T16:16:37.187Z",
-        "ecs": {"version": "1.5.0"},
+        "ecs": {"version": "1.6.0"},
         "log": {
             "level": "info",
             "logger": logger.name,
