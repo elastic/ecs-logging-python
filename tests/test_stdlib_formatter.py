@@ -4,8 +4,14 @@ import pytest
 import json
 import time
 import random
+import sys
 import ecs_logging
 from .compat import StringIO
+
+
+requires_py3 = pytest.mark.skipif(
+    sys.version_info[0] < 3, reason="Test requires Python 3.x+"
+)
 
 
 @pytest.fixture(scope="function")
@@ -258,3 +264,34 @@ def test_exclude_fields_type_and_values():
     with pytest.raises(TypeError) as e:
         ecs_logging.StdlibFormatter(exclude_fields=[1])
     assert str(e.value) == "'exclude_fields' must be a sequence of strings"
+
+
+@requires_py3
+def test_stack_info(logger):
+    stream = StringIO()
+    handler = logging.StreamHandler(stream)
+    handler.setFormatter(ecs_logging.StdlibFormatter())
+    logger.addHandler(handler)
+    logger.setLevel(logging.DEBUG)
+
+    logger.info("stack info!", stack_info=True)
+
+    ecs = json.loads(stream.getvalue().rstrip())
+    assert list(ecs["error"].keys()) == ["stack_trace"]
+    error_stack_trace = ecs["error"].pop("stack_trace")
+    assert "test_stack_info" in error_stack_trace and __file__ in error_stack_trace
+
+
+@requires_py3
+@pytest.mark.parametrize("exclude_fields", [["error"], ["error.stack_trace"]])
+def test_stack_info_excluded(logger, exclude_fields):
+    stream = StringIO()
+    handler = logging.StreamHandler(stream)
+    handler.setFormatter(ecs_logging.StdlibFormatter(exclude_fields=exclude_fields))
+    logger.addHandler(handler)
+    logger.setLevel(logging.DEBUG)
+
+    logger.info("stack info!", stack_info=True)
+
+    ecs = json.loads(stream.getvalue().rstrip())
+    assert "error" not in ecs

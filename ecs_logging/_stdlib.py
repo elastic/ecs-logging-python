@@ -61,6 +61,8 @@ class StdlibFormatter(logging.Formatter):
             Specifies the maximum number of frames to include for stack
             traces. Defaults to ``None`` which includes all available frames.
             Setting this to zero will suppress stack traces.
+            This setting doesn't affect ``LogRecord.stack_info`` because
+            this attribute is typically already pre-formatted.
         :param Sequence[str] exclude_fields:
             Specifies any fields that should be suppressed from the resulting
             fields, expressed with dot notation::
@@ -203,13 +205,20 @@ class StdlibFormatter(logging.Formatter):
 
     def _record_error_stack_trace(self, record):
         # type: (logging.LogRecord) -> Optional[str]
-        if not (
+        # Using stack_info=True will add 'error.stack_trace' even
+        # if the type is not 'error', exc_info=True only gathers
+        # when there's an active exception.
+        if (
             record.exc_info
             and record.exc_info[2] is not None
             and (self._stack_trace_limit is None or self._stack_trace_limit > 0)
         ):
-            return None
-        return (
-            "".join(format_tb(record.exc_info[2], limit=self._stack_trace_limit))
-            or None
-        )
+            return (
+                "".join(format_tb(record.exc_info[2], limit=self._stack_trace_limit))
+                or None
+            )
+        # LogRecord only has 'stack_info' if it's passed via .log(..., stack_info=True)
+        stack_info = getattr(record, "stack_info", None)
+        if stack_info:
+            return str(stack_info)
+        return None
