@@ -26,3 +26,7 @@ def test_normalize_dict():
     assert normalize_dict(
         {"a": {"b": 1}, "a.c": {"d.e": {"f": 1}, "d.e.g": [{"f.c": 2}]}}
     ) == {"a": {"b": 1, "c": {"d": {"e": {"f": 1, "g": [{"f": {"c": 2}}]}}}}}
+
+
+def test_normalize_dict_with_array():
+    assert normalize_dict({"a": ["1", "2"]}) == {"a": ["1", "2"]}
