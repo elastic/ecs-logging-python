@@ -33,7 +33,7 @@ def test_elasticapm_structlog_log_correlation_ecs_fields():
     ecs = json.loads(stream.getvalue().rstrip())
     ecs.pop("@timestamp")
     assert ecs == {
-        "ecs": {"version": "1.5.0"},
+        "ecs": {"version": "1.6.0"},
         "log": {"level": "info"},
         "message": "test message",
         "span": {"id": span_id},
@@ -71,7 +71,7 @@ def test_elastic_apm_stdlib_no_filter_log_correlation_ecs_fields():
 
     ecs = json.loads(stream.getvalue().rstrip())
     assert ecs == {
-        "ecs": {"version": "1.5.0"},
+        "ecs": {"version": "1.6.0"},
         "log": {
             "level": "info",
             "logger": "apm-logger",
@@ -115,7 +115,7 @@ def test_elastic_apm_stdlib_with_filter_log_correlation_ecs_fields():
 
     ecs = json.loads(stream.getvalue().rstrip())
     assert ecs == {
-        "ecs": {"version": "1.5.0"},
+        "ecs": {"version": "1.6.0"},
         "log": {
             "level": "info",
             "logger": "apm-logger",
@@ -162,7 +162,7 @@ def test_elastic_apm_stdlib_exclude_fields():
 
     ecs = json.loads(stream.getvalue().rstrip())
     assert ecs == {
-        "ecs": {"version": "1.5.0"},
+        "ecs": {"version": "1.6.0"},
         "log": {
             "level": "info",
             "logger": "apm-logger",

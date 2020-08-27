@@ -14,7 +14,7 @@ def test_event_dict_formatted(time):
 
     formatter = ecs_logging.StructlogFormatter()
     assert formatter(None, "debug", make_event_dict()) == (
-        '{"@timestamp":"2020-03-20T16:16:37.187Z","ecs":{"version":"1.5.0"},'
+        '{"@timestamp":"2020-03-20T16:16:37.187Z","ecs":{"version":"1.6.0"},'
         '"log":{"level":"debug","logger":"logger-name"},"message":"test message"}'
     )
 
@@ -36,6 +36,6 @@ def test_can_be_set_as_processor(time):
 
     assert stream.getvalue() == (
         '{"@timestamp":"2020-03-20T16:16:37.187Z","custom":"key",'
-        '"dot":{"ted":1},"ecs":{"version":"1.5.0"},"log":{"level":"debug"},'
+        '"dot":{"ted":1},"ecs":{"version":"1.6.0"},"log":{"level":"debug"},'
         '"message":"test message"}\n'
     )
