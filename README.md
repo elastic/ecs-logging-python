@@ -11,7 +11,7 @@ changes might be introduced in future releases. While we strive to comply to
 Check out the [Elastic Common Schema (ECS) reference](https://www.elastic.co/guide/en/ecs/current/index.html)
 for more information.
 
-The library currently implements ECS 1.5, after a 1.x version is released
+The library currently implements ECS 1.6, after a 1.x version is released
 we will be following (ECS.major).(ECS.minor).(package minor) as our versioning scheme.
 
 ## Installation
@@ -48,7 +48,7 @@ logger.debug("Example message!", extra={"http.request.method": "get"})
 {
     "@timestamp": "2020-03-20T18:11:37.895Z",
     "ecs": {
-        "version": "1.5.0"
+        "version": "1.6.0"
     },
     "http": {
       "request": {
@@ -155,7 +155,7 @@ logger.debug("Example message!")
 {
   "@timestamp": "2020-03-26T13:08:11.728Z",
   "ecs": {
-    "version": "1.5.0"
+    "version": "1.6.0"
   },
   "http": {
     "request": {
