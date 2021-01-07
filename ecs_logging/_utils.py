@@ -103,4 +103,48 @@ def merge_dicts(from_, into):
 
 def json_dumps(value):
     # type: (Dict[str, Any]) -> str
-    return json.dumps(value, sort_keys=True, separators=(",", ":"))
+
+    # Ensure that the first three fields are '@timestamp',
+    # 'log.level', and 'message' per ECS spec
+    ordered_fields = []
+    try:
+        ordered_fields.append(("@timestamp", value.pop("@timestamp")))
+    except KeyError:
+        pass
+
+    # log.level can either be nested or not nested so we have to try both
+    try:
+        ordered_fields.append(("log.level", value["log"].pop("level")))
+        if not value["log"]:  # Remove the 'log' dictionary if it's now empty
+            value.pop("log", None)
+    except KeyError:
+        try:
+            ordered_fields.append(("log.level", value.pop("log.level")))
+        except KeyError:
+            pass
+    try:
+        ordered_fields.append(("message", value.pop("message")))
+    except KeyError:
+        pass
+
+    # Because we want to use 'sorted_keys=True' we manually build
+    # the first three keys and then build the rest with json.dumps()
+    if ordered_fields:
+        # Need to call json.dumps() on values just in
+        # case the given values aren't strings (even though
+        # they should be according to the spec)
+        ordered_json = ",".join(
+            '"%s":%s' % (k, json.dumps(v, sort_keys=True, separators=(",", ":")))
+            for k, v in ordered_fields
+        )
+        if value:
+            return "{%s,%s" % (
+                ordered_json,
+                json.dumps(value, sort_keys=True, separators=(",", ":"))[1:],
+            )
+        else:
+            return "{%s}" % ordered_json
+    # If there are no fields with ordering requirements we
+    # pass everything into json.dumps()
+    else:
+        return json.dumps(value, sort_keys=True, separators=(",", ":"))

@@ -34,7 +34,7 @@ def test_elasticapm_structlog_log_correlation_ecs_fields():
     ecs.pop("@timestamp")
     assert ecs == {
         "ecs": {"version": "1.6.0"},
-        "log": {"level": "info"},
+        "log.level": "info",
         "message": "test message",
         "span": {"id": span_id},
         "trace": {"id": trace_id},
@@ -72,8 +72,8 @@ def test_elastic_apm_stdlib_no_filter_log_correlation_ecs_fields():
     ecs = json.loads(stream.getvalue().rstrip())
     assert ecs == {
         "ecs": {"version": "1.6.0"},
+        "log.level": "info",
         "log": {
-            "level": "info",
             "logger": "apm-logger",
             "origin": {
                 "file": {"name": "test_apm.py"},
@@ -116,8 +116,8 @@ def test_elastic_apm_stdlib_with_filter_log_correlation_ecs_fields():
     ecs = json.loads(stream.getvalue().rstrip())
     assert ecs == {
         "ecs": {"version": "1.6.0"},
+        "log.level": "info",
         "log": {
-            "level": "info",
             "logger": "apm-logger",
             "origin": {
                 "file": {"name": "test_apm.py"},
@@ -163,8 +163,8 @@ def test_elastic_apm_stdlib_exclude_fields():
     ecs = json.loads(stream.getvalue().rstrip())
     assert ecs == {
         "ecs": {"version": "1.6.0"},
+        "log.level": "info",
         "log": {
-            "level": "info",
             "logger": "apm-logger",
             "origin": {
                 "file": {"name": "test_apm.py"},
