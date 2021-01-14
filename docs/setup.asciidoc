@@ -190,3 +190,11 @@ logger.debug("Example message!")
 `ecs-logging-python` supports automatically collecting https://www.elastic.co/guide/en/ecs/master/ecs-tracing.html[ECS tracing fields]
 from the https://github.com/elastic/apm-agent-python[Elastic APM Python agent] in order to
 https://www.elastic.co/guide/en/apm/agent/python/current/log-correlation.html[correlate logs to spans, transactions and traces] in Elastic APM.
+
+[float]
+[[filebeat]]
+== Install Filebeat
+
+The best way to collect the logs once they are ECS-formatted is with https://www.elastic.co/beats/filebeat[Filebeat]:
+
+include::{ecs-repo-dir}/setup.asciidoc[tag=configure-filebeat]
