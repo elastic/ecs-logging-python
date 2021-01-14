@@ -1,4 +1,3 @@
-[float]
 [[installation]]
 == Installation
 

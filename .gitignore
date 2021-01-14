@@ -133,3 +133,6 @@ junit-test.xml
 
 # VSCode
 .vscode/
+
+# Doc build
+html_docs
