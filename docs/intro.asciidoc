@@ -1,0 +1,10 @@
+[[intro]]
+== Introduction
+
+ECS loggers are formatter/encoder plugins for your favorite logging libraries.
+They make it easy to format your logs into ECS-compatible JSON.
+
+TIP: Want to learn more about ECS, ECS logging, and other available language plugins?
+See the {ecs-logging-ref}/intro.html[ECS logging guide].
+
+Ready to jump into `ecs-logging-python`? <<installation,Get started>>.

@@ -130,3 +130,9 @@ dmypy.json
 
 # JUnit file
 junit-test.xml
+
+# VSCode
+.vscode/
+
+# Doc build
+html_docs
