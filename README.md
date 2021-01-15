@@ -14,6 +14,12 @@ for more information.
 The library currently implements ECS 1.6, after a 1.x version is released
 we will be following (ECS.major).(ECS.minor).(package minor) as our versioning scheme.
 
+## Installation
+
+```console
+$ python -m pip install ecs-logging
+```
+
 ## Documentation
 
 See the [ECS Logging Python reference](https://www.elastic.co/guide/en/ecs-logging/python/current/index.html) on elastic.co to get started.
