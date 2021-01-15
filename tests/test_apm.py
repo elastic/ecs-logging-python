@@ -10,7 +10,7 @@ import pytest
 from .compat import StringIO
 
 
-def test_elasticapm_structlog_log_correlation_ecs_fields():
+def test_elasticapm_structlog_log_correlation_ecs_fields(spec_validator):
     apm = elasticapm.Client({"SERVICE_NAME": "apm-service", "DISABLE_SEND": True})
     stream = StringIO()
     logger = structlog.PrintLogger(stream)
@@ -30,7 +30,7 @@ def test_elasticapm_structlog_log_correlation_ecs_fields():
     finally:
         apm.end_transaction("test-transaction")
 
-    ecs = json.loads(stream.getvalue().rstrip())
+    ecs = json.loads(spec_validator(stream.getvalue().rstrip()))
     ecs.pop("@timestamp")
     assert ecs == {
         "ecs": {"version": "1.6.0"},
