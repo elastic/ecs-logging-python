@@ -40,9 +40,13 @@ def spec_validator():
                 if not found:
                     raise ValidationError("Missing required key {}".format(k))
             if k in data:
-                if v["type"] == "string" and not isinstance(data[k], str):
+                if v["type"] == "string" and not (
+                    isinstance(data[k], str) or isinstance(data[k], basestring)
+                ):
                     raise ValidationError(
-                        "Value {0} for key {1} should be string".format(data[k], k)
+                        "Value {0} for key {1} should be string, is {2}".format(
+                            data[k], k, type(data[k])
+                        )
                     )
                 if v["type"] == "datetime":
                     try:
