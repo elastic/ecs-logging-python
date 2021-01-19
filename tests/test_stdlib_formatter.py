@@ -35,17 +35,17 @@ def make_record():
     return record
 
 
-def test_record_formatted():
+def test_record_formatted(spec_validator):
     formatter = ecs_logging.StdlibFormatter(exclude_fields=["process"])
 
-    assert formatter.format(make_record()) == (
+    assert spec_validator(formatter.format(make_record())) == (
         '{"@timestamp":"2020-03-20T14:12:46.123Z","log.level":"debug","message":"1: hello","ecs":{"version":"1.6.0"},'
         '"log":{"logger":"logger-name","origin":{"file":{"line":10,"name":"file.py"},"function":"test_function"},'
         '"original":"1: hello"}}'
     )
 
 
-def test_can_be_overridden():
+def test_can_be_overridden(spec_validator):
     class CustomFormatter(ecs_logging.StdlibFormatter):
         def format_to_ecs(self, record):
             ecs_dict = super(CustomFormatter, self).format_to_ecs(record)
@@ -53,7 +53,7 @@ def test_can_be_overridden():
             return ecs_dict
 
     formatter = CustomFormatter(exclude_fields=["process"])
-    assert formatter.format(make_record()) == (
+    assert spec_validator(formatter.format(make_record())) == (
         '{"@timestamp":"2020-03-20T14:12:46.123Z","log.level":"debug","message":"1: hello",'
         '"custom":"field","ecs":{"version":"1.6.0"},"log":{"logger":"logger-name","origin":'
         '{"file":{"line":10,"name":"file.py"},"function":"test_function"},"original":"1: hello"}}'

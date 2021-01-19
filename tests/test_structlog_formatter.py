@@ -9,11 +9,11 @@ def make_event_dict():
 
 
 @mock.patch("time.time")
-def test_event_dict_formatted(time):
+def test_event_dict_formatted(time, spec_validator):
     time.return_value = 1584720997.187709
 
     formatter = ecs_logging.StructlogFormatter()
-    assert formatter(None, "debug", make_event_dict()) == (
+    assert spec_validator(formatter(None, "debug", make_event_dict())) == (
         '{"@timestamp":"2020-03-20T16:16:37.187Z","log.level":"debug",'
         '"message":"test message","ecs":{"version":"1.6.0"},'
         '"log":{"logger":"logger-name"}}'
@@ -21,7 +21,7 @@ def test_event_dict_formatted(time):
 
 
 @mock.patch("time.time")
-def test_can_be_set_as_processor(time):
+def test_can_be_set_as_processor(time, spec_validator):
     time.return_value = 1584720997.187709
 
     stream = StringIO()
@@ -35,7 +35,7 @@ def test_can_be_set_as_processor(time):
     logger = structlog.get_logger("logger-name")
     logger.debug("test message", custom="key", **{"dot.ted": 1})
 
-    assert stream.getvalue() == (
+    assert spec_validator(stream.getvalue()) == (
         '{"@timestamp":"2020-03-20T16:16:37.187Z","log.level":"debug",'
         '"message":"test message","custom":"key","dot":{"ted":1},'
         '"ecs":{"version":"1.6.0"}}\n'
