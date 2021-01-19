@@ -50,7 +50,7 @@ def spec_validator():
                     )
                 if v["type"] == "datetime":
                     try:
-                        datetime.datetime.fromisoformat(data[k].rstrip("Z"))
+                        datetime.datetime.strptime(data[k], "%Y-%m-%dT%H:%M:%S.%fZ")
                     except ValueError:
                         raise ValidationError(
                             "Value {0} for key {1} doesn't parse as an ISO datetime".format(
