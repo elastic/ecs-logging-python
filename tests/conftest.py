@@ -1,6 +1,7 @@
 import datetime
 import json
 import os
+import collections
 
 import pytest
 
@@ -23,7 +24,7 @@ def spec_validator():
         Returns the original json (pass-through)
         """
         fields = spec["fields"]
-        data = json.loads(data_json)
+        data = json.loads(data_json, object_pairs_hook=collections.OrderedDict)
         for k, v in fields.items():
             if v.get("required"):
                 found = False
@@ -57,15 +58,8 @@ def spec_validator():
                                 data[k], k
                             )
                         )
-            if v.get("index"):
-                index = v.get("index")
-                key = json.loads(
-                    data_json.split(",")[index].split(":")[0].strip().lstrip("{")
-                )
-                if key != k:
-                    raise ValidationError(
-                        "Key {0} is not at index {1}".format(k, index)
-                    )
+            if v.get("index") and list(data.keys())[v.get("index")] != k:
+                raise ValidationError("Key {0} is not at index {1}".format(k, index))
 
         return data_json
 
