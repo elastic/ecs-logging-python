@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.0 (2021-02-08)
+
+* Remove "beta" designation
+
 ## 0.6.0 (2021-01-21)
 
 * Add validation against the ecs-logging [spec](https://github.com/elastic/ecs-logging/blob/master/spec/spec.json) ([#31](https://github.com/elastic/ecs-logging-python/pull/31))
@@ -10,7 +14,7 @@
 
 - Updated supported ECS version to 1.6.0 ([#24](https://github.com/elastic/ecs-logging-python/pull/24))
 - Added support for `LogRecord.stack_info` ([#23](https://github.com/elastic/ecs-logging-python/pull/23))
-- Fixed normalizing of items in `list` that aren't of type 
+- Fixed normalizing of items in `list` that aren't of type
   `dict` ([#22](https://github.com/elastic/ecs-logging-python/pull/22), contributed by [`@camerondavison`](https://github.com/camerondavison))
 
 ## 0.4 (2020-08-04)

@@ -4,15 +4,10 @@
 [![PyPI](https://img.shields.io/pypi/v/ecs-logging)](https://pypi.org/project/ecs-logging)
 [![Versions Supported](https://img.shields.io/pypi/pyversions/ecs-logging)](https://pypi.org/project/ecs-logging)
 
-**Please note** that this is library is in a **beta** version and backwards-incompatible
-changes might be introduced in future releases. While we strive to comply to
-[semver](https://semver.org), we can not guarantee to avoid breaking changes in minor releases.
-
 Check out the [Elastic Common Schema (ECS) reference](https://www.elastic.co/guide/en/ecs/current/index.html)
 for more information.
 
-The library currently implements ECS 1.6, after a 1.x version is released
-we will be following (ECS.major).(ECS.minor).(package minor) as our versioning scheme.
+The library currently implements ECS 1.6.
 
 ## Installation
 
