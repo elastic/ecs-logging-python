@@ -1,0 +1,2 @@
+ecs-logging-python
+Copyright 2020-2021 Elasticsearch B.V.
