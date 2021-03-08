@@ -190,6 +190,10 @@ logger.debug("Example message!")
 from the https://github.com/elastic/apm-agent-python[Elastic APM Python agent] in order to
 https://www.elastic.co/guide/en/apm/agent/python/current/log-correlation.html[correlate logs to spans, transactions and traces] in Elastic APM.
 
+You can also quickly turn on ECS-formatted logs in your python app by setting
+https://www.elastic.co/guide/en/apm/agent/python/master/configuration.html#config-log_ecs_formatting[`LOG_ECS_FORMATTING=override`]
+in the Elastic APM Python agent.
+
 [float]
 [[filebeat]]
 == Install Filebeat
