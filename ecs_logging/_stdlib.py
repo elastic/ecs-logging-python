@@ -16,6 +16,7 @@
 # under the License.
 
 import logging
+import sys
 import time
 from traceback import format_tb
 from ._meta import ECS_VERSION
