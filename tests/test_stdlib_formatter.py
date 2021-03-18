@@ -183,6 +183,22 @@ def test_stack_trace_limit_disabled(stack_trace_limit, logger):
     assert ecs["log"]["original"] == "there was an error"
 
 
+def test_exc_info_false_does_not_raise(logger):
+    stream = StringIO()
+    handler = logging.StreamHandler(stream)
+    handler.setFormatter(
+        ecs_logging.StdlibFormatter()
+    )
+    logger.addHandler(handler)
+    logger.setLevel(logging.DEBUG)
+
+    logger.info("there was %serror", "no ", exc_info=False)
+
+    ecs = json.loads(stream.getvalue().rstrip())
+    assert ecs["log.level"] == "info"
+    assert ecs["message"] == "there was no error"
+
+
 def test_stack_trace_limit_traceback(logger):
     def f():
         g()

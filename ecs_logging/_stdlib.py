@@ -112,6 +112,24 @@ class StdlibFormatter(logging.Formatter):
         self._exclude_fields = frozenset(exclude_fields)
         self._stack_trace_limit = stack_trace_limit
 
+    def _record_error_type(self, record):
+        # upstream doesn't handle booleans for `exc_info`
+        if not record.exc_info:
+            return None
+        if isinstance(record.exc_info, bool):
+            return sys.exc_info()[0].__name__
+        if isinstance(record.exc_info, (list, tuple)) and record.exc_info[0] is not None:
+            return record.exc_info[0].__name__
+
+    def _record_error_message(self, record):
+        # upstream doesn't handle booleans for `exc_info`
+        if not record.exc_info:
+            return None
+        if isinstance(record.exc_info, bool):
+            return sys.exc_info()[1].__name__
+        elif isinstance(record.exc_info, (list, tuple)) and record.exc_info[1]:
+            return str(record.exc_info[1])
+
     def format(self, record):
         # type: (logging.LogRecord) -> str
         result = self.format_to_ecs(record)
@@ -145,14 +163,8 @@ class StdlibFormatter(logging.Formatter):
             "process.name": self._record_attribute("processName"),
             "process.thread.id": self._record_attribute("thread"),
             "process.thread.name": self._record_attribute("threadName"),
-            "error.type": lambda r: (
-                r.exc_info[0].__name__
-                if (r.exc_info is not None and r.exc_info[0] is not None)
-                else None
-            ),
-            "error.message": lambda r: (
-                str(r.exc_info[1]) if r.exc_info and r.exc_info[1] else None
-            ),
+            "error.type": self._record_error_type,
+            "error.message": self._record_error_message,
             "error.stack_trace": self._record_error_stack_trace,
         }  # type: Dict[str, Callable[[logging.LogRecord],Any]]
 
