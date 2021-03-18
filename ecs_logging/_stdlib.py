@@ -117,7 +117,7 @@ class StdlibFormatter(logging.Formatter):
         exc_info = record.exc_info
         if not exc_info:
             # exc_info is either an iterable or bool. If it doesn't
-            # evaluate to True, then no error type used.
+            # evaluate to True, then no error type is used.
             return None
         if isinstance(exc_info, bool):
             # if it is a bool, then look at sys.exc_info
