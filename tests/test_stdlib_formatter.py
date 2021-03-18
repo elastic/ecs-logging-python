@@ -186,9 +186,7 @@ def test_stack_trace_limit_disabled(stack_trace_limit, logger):
 def test_exc_info_false_does_not_raise(logger):
     stream = StringIO()
     handler = logging.StreamHandler(stream)
-    handler.setFormatter(
-        ecs_logging.StdlibFormatter()
-    )
+    handler.setFormatter(ecs_logging.StdlibFormatter())
     logger.addHandler(handler)
     logger.setLevel(logging.DEBUG)
 

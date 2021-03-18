@@ -113,22 +113,32 @@ class StdlibFormatter(logging.Formatter):
         self._stack_trace_limit = stack_trace_limit
 
     def _record_error_type(self, record):
-        # upstream doesn't handle booleans for `exc_info`
-        if not record.exc_info:
+        # type: (logging.LogRecord) -> Optional[str]
+        exc_info = record.exc_info
+        if not exc_info:
+            # exc_info is either an iterable or bool. If it doesn't
+            # evaluate to True, then no error type used.
             return None
-        if isinstance(record.exc_info, bool):
-            return sys.exc_info()[0].__name__
-        if isinstance(record.exc_info, (list, tuple)) and record.exc_info[0] is not None:
-            return record.exc_info[0].__name__
+        if isinstance(exc_info, bool):
+            # if it is a bool, then look at sys.exc_info
+            exc_info = sys.exc_info()
+        if isinstance(exc_info, (list, tuple)) and exc_info[0] is not None:
+            return exc_info[0].__name__
+        return None
 
     def _record_error_message(self, record):
-        # upstream doesn't handle booleans for `exc_info`
-        if not record.exc_info:
+        # type: (logging.LogRecord) -> Optional[str]
+        exc_info = record.exc_info
+        if not exc_info:
+            # exc_info is either an iterable or bool. If it doesn't
+            # evaluate to True, then no error message is used.
             return None
-        if isinstance(record.exc_info, bool):
-            return sys.exc_info()[1].__name__
-        elif isinstance(record.exc_info, (list, tuple)) and record.exc_info[1]:
-            return str(record.exc_info[1])
+        if isinstance(exc_info, bool):
+            # if it is a bool, then look at sys.exc_info
+            exc_info = sys.exc_info()
+        if isinstance(exc_info, (list, tuple)) and exc_info[1]:
+            return str(exc_info[1])
+        return None
 
     def format(self, record):
         # type: (logging.LogRecord) -> str
