@@ -195,6 +195,7 @@ def test_exc_info_false_does_not_raise(logger):
     ecs = json.loads(stream.getvalue().rstrip())
     assert ecs["log.level"] == "info"
     assert ecs["message"] == "there was no error"
+    assert "error" not in ecs
 
 
 def test_stack_trace_limit_traceback(logger):
