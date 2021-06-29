@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+* Add default/fallback handling for json.dumps ([#47](https://github.com/elastic/ecs-logging-python/pull/47))
+
 ## 1.0.0 (2021-02-08)
 
 * Remove "beta" designation
