@@ -151,17 +151,46 @@ def json_dumps(value):
         # case the given values aren't strings (even though
         # they should be according to the spec)
         ordered_json = ",".join(
-            '"%s":%s' % (k, json.dumps(v, sort_keys=True, separators=(",", ":")))
+            '"%s":%s'
+            % (
+                k,
+                json.dumps(
+                    v,
+                    sort_keys=True,
+                    separators=(",", ":"),
+                    default=_json_dumps_fallback,
+                ),
+            )
             for k, v in ordered_fields
         )
         if value:
             return "{%s,%s" % (
                 ordered_json,
-                json.dumps(value, sort_keys=True, separators=(",", ":"))[1:],
+                json.dumps(
+                    value,
+                    sort_keys=True,
+                    separators=(",", ":"),
+                    default=_json_dumps_fallback,
+                )[1:],
             )
         else:
             return "{%s}" % ordered_json
     # If there are no fields with ordering requirements we
     # pass everything into json.dumps()
     else:
-        return json.dumps(value, sort_keys=True, separators=(",", ":"))
+        return json.dumps(
+            value, sort_keys=True, separators=(",", ":"), default=_json_dumps_fallback
+        )
+
+
+def _json_dumps_fallback(value):
+    # type: (Any) -> Any
+    """
+    Fallback handler for json.dumps to handle objects json doesn't know how to
+    serialize.
+    """
+    try:
+        # This is what structlog's json fallback does
+        return value.__structlog__()
+    except AttributeError:
+        return repr(value)
