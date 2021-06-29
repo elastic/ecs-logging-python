@@ -21,8 +21,17 @@ import mock
 from .compat import StringIO
 
 
+class NotSerializable:
+    def __repr__(self):
+        return "<NotSerializable>"
+
+
 def make_event_dict():
-    return {"event": "test message", "log.logger": "logger-name"}
+    return {
+        "event": "test message",
+        "log.logger": "logger-name",
+        "baz": NotSerializable(),
+    }
 
 
 @mock.patch("time.time")
@@ -32,7 +41,9 @@ def test_event_dict_formatted(time, spec_validator):
     formatter = ecs_logging.StructlogFormatter()
     assert spec_validator(formatter(None, "debug", make_event_dict())) == (
         '{"@timestamp":"2020-03-20T16:16:37.187Z","log.level":"debug",'
-        '"message":"test message","ecs":{"version":"1.6.0"},'
+        '"message":"test message",'
+        '"baz":"<NotSerializable>",'
+        '"ecs":{"version":"1.6.0"},'
         '"log":{"logger":"logger-name"}}'
     )
 
