@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+* Fix for duplicate dotted keys ([#46])
+
 ## 1.0.0 (2021-02-08)
 
 * Remove "beta" designation
