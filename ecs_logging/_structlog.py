@@ -36,7 +36,7 @@ class StructlogFormatter:
 
     def format_to_ecs(self, event_dict):
         # type: (Dict[str, Any]) -> Dict[str, Any]
-        event_dict["message"] = event_dict.pop("event")
+        event_dict["message"] = str(event_dict.pop("event"))
         if "@timestamp" not in event_dict:
             event_dict["@timestamp"] = (
                 datetime.datetime.utcfromtimestamp(time.time()).strftime(
