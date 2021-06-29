@@ -19,12 +19,17 @@ import datetime
 import json
 import os
 import collections
+import sys
 
 import pytest
 
 
 class ValidationError(Exception):
     pass
+
+
+if sys.version_info[0] >= 3:
+    basestring = str
 
 
 @pytest.fixture

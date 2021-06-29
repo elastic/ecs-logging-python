@@ -111,8 +111,8 @@ def merge_dicts(from_, into):
     When called has side-effects within 'destination'.
     """
     for key, value in from_.items():
-        if isinstance(value, dict):
-            merge_dicts(value, into.setdefault(key, {}))
+        if isinstance(value, dict) and isinstance(into.setdefault(key, {}), dict):
+            merge_dicts(value, into[key])
         else:
             into[key] = value
     return into
