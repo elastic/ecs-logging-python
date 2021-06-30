@@ -29,6 +29,10 @@ class StructlogFormatter:
 
     def __call__(self, _, name, event_dict):
         # type: (Any, str, Dict[str, Any]) -> str
+
+        # Handle event -> message now so that stuff like `event.dataset` doesn't
+        # cause problems down the line
+        event_dict["message"] = str(event_dict.pop("event"))
         event_dict = normalize_dict(event_dict)
         event_dict.setdefault("log", {}).setdefault("level", name.lower())
         event_dict = self.format_to_ecs(event_dict)
@@ -36,7 +40,6 @@ class StructlogFormatter:
 
     def format_to_ecs(self, event_dict):
         # type: (Dict[str, Any]) -> Dict[str, Any]
-        event_dict["message"] = str(event_dict.pop("event"))
         if "@timestamp" not in event_dict:
             event_dict["@timestamp"] = (
                 datetime.datetime.utcfromtimestamp(time.time()).strftime(
