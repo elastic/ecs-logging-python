@@ -20,14 +20,24 @@ import structlog
 import mock
 from .compat import StringIO
 
+import pytest
+
 
 def make_event_dict():
     return {
         "event": "test message",
+        "event.dataset": "agent.log",
         "log.logger": "logger-name",
         "foo": "bar",
-        "foo.dataset": "baz",
     }
+
+
+def test_conflicting_event_dict():
+    formatter = ecs_logging.StructlogFormatter()
+    event_dict = make_event_dict()
+    event_dict["foo.bar"] = "baz"
+    with pytest.raises(TypeError):
+        formatter(None, "debug", event_dict)
 
 
 @mock.patch("time.time")
@@ -38,7 +48,8 @@ def test_event_dict_formatted(time, spec_validator):
     assert spec_validator(formatter(None, "debug", make_event_dict())) == (
         '{"@timestamp":"2020-03-20T16:16:37.187Z","log.level":"debug",'
         '"message":"test message","ecs":{"version":"1.6.0"},'
-        '"foo":{"dataset":"baz"},'
+        '"event":{"dataset":"agent.log"},'
+        '"foo":"bar",'
         '"log":{"logger":"logger-name"}}'
     )
 
