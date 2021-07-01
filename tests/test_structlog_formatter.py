@@ -31,7 +31,6 @@ class NotSerializable:
 def make_event_dict():
     return {
         "event": "test message",
-
         "event.dataset": "agent.log",
         "log.logger": "logger-name",
         "foo": "bar",
