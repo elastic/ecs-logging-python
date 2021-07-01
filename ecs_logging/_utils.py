@@ -16,6 +16,7 @@
 # under the License.
 
 import json
+import functools
 
 try:
     import typing
@@ -152,11 +153,9 @@ def json_dumps(value):
     except KeyError:
         pass
 
-    json_dumps_kwargs = {
-        "sort_keys": True,
-        "separators": (",", ":"),
-        "default": _json_dumps_fallback,
-    }
+    json_dumps = functools.partial(
+        json.dumps, sort_keys=True, separators=(",", ":"), default=_json_dumps_fallback
+    )
 
     # Because we want to use 'sorted_keys=True' we manually build
     # the first three keys and then build the rest with json.dumps()
@@ -168,21 +167,21 @@ def json_dumps(value):
             '"%s":%s'
             % (
                 k,
-                json.dumps(v, **json_dumps_kwargs),
+                json_dumps(v),
             )
             for k, v in ordered_fields
         )
         if value:
             return "{%s,%s" % (
                 ordered_json,
-                json.dumps(value, **json_dumps_kwargs)[1:],
+                json_dumps(value)[1:],
             )
         else:
             return "{%s}" % ordered_json
     # If there are no fields with ordering requirements we
     # pass everything into json.dumps()
     else:
-        return json.dumps(value, **json_dumps_kwargs)
+        return json_dumps(value)
 
 
 def _json_dumps_fallback(value):
