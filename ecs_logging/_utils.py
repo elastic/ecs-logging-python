@@ -114,7 +114,7 @@ def merge_dicts(from_, into):
         into.setdefault(key, {})
         if isinstance(value, dict) and isinstance(into[key], dict):
             merge_dicts(value, into[key])
-        elif into[key]:
+        elif into[key] != {}:
             raise TypeError(
                 "Type mismatch at key `{}`: merging dicts would replace value `{}` with `{}`. This is likely due to "
                 "dotted keys in the event dict being turned into nested dictionaries, causing a conflict.".format(

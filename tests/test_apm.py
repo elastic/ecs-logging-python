@@ -27,11 +27,6 @@ import pytest
 from .compat import StringIO
 
 
-# elasticapm only supports python 3.6+
-if sys.version_info < (3, 6):
-    pytestmark = [pytest.mark.skip]
-
-
 def test_elasticapm_structlog_log_correlation_ecs_fields(spec_validator, apm):
     stream = StringIO()
     logger = structlog.PrintLogger(stream)

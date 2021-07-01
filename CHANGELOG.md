@@ -2,7 +2,9 @@
 
 ## Unreleased
 
-* Fix for duplicate dotted keys ([#46])
+* Fixed an issue in `StructlogFormatter` caused by a conflict with `event`
+  (used for the log `message`) and `event.dataset` (a field provided by the
+  `elasticapm` integration) ([#46](https://github.com/elastic/ecs-logging-python/pull/46))
 
 ## 1.0.0 (2021-02-08)
 

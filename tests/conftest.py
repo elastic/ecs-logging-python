@@ -92,6 +92,8 @@ def spec_validator():
 
 @pytest.fixture
 def apm():
+    if sys.version_info < (3, 6):
+        pytest.skip("elasticapm only supports python 3.6+")
     if sys.version_info[0] >= 3:
         record_factory = logging.getLogRecordFactory()
     apm = elasticapm.Client({"SERVICE_NAME": "apm-service", "DISABLE_SEND": True})
