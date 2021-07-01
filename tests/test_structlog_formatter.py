@@ -20,6 +20,8 @@ import structlog
 import mock
 from .compat import StringIO
 
+import pytest
+
 
 class NotSerializable:
     def __repr__(self):
@@ -29,9 +31,20 @@ class NotSerializable:
 def make_event_dict():
     return {
         "event": "test message",
+
+        "event.dataset": "agent.log",
         "log.logger": "logger-name",
+        "foo": "bar",
         "baz": NotSerializable(),
     }
+
+
+def test_conflicting_event_dict():
+    formatter = ecs_logging.StructlogFormatter()
+    event_dict = make_event_dict()
+    event_dict["foo.bar"] = "baz"
+    with pytest.raises(TypeError):
+        formatter(None, "debug", event_dict)
 
 
 @mock.patch("time.time")
@@ -44,6 +57,8 @@ def test_event_dict_formatted(time, spec_validator):
         '"message":"test message",'
         '"baz":"<NotSerializable>",'
         '"ecs":{"version":"1.6.0"},'
+        '"event":{"dataset":"agent.log"},'
+        '"foo":"bar",'
         '"log":{"logger":"logger-name"}}'
     )
 

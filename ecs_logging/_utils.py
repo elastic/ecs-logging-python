@@ -111,8 +111,16 @@ def merge_dicts(from_, into):
     When called has side-effects within 'destination'.
     """
     for key, value in from_.items():
-        if isinstance(value, dict):
-            merge_dicts(value, into.setdefault(key, {}))
+        into.setdefault(key, {})
+        if isinstance(value, dict) and isinstance(into[key], dict):
+            merge_dicts(value, into[key])
+        elif into[key] != {}:
+            raise TypeError(
+                "Type mismatch at key `{}`: merging dicts would replace value `{}` with `{}`. This is likely due to "
+                "dotted keys in the event dict being turned into nested dictionaries, causing a conflict.".format(
+                    key, into[key], value
+                )
+            )
         else:
             into[key] = value
     return into
