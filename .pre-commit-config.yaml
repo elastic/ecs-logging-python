@@ -5,10 +5,24 @@ repos:
     -   id: check-case-conflict
     -   id: check-executables-have-shebangs
     -   id: check-merge-conflict
-
 -   repo: git@github.com:elastic/apm-pipeline-library
     rev: current
     hooks:
     -   id: check-bash-syntax
     -   id: check-jenkins-pipelines
     -   id: check-jjbb
+-   repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v0.910
+    hooks:
+    -   id: mypy
+        args: [--strict]
+-   repo: https://github.com/ambv/black
+    rev: 20.8b1
+    hooks:
+    -   id: black
+        language_version: python3
+-   repo: https://gitlab.com/pycqa/flake8
+    rev: 3.8.4
+    hooks:
+    -   id: flake8
+        exclude: tests|conftest.py|setup.py
