@@ -16,6 +16,7 @@
 # under the License.
 
 import logging
+import sys
 import time
 from traceback import format_tb
 from ._meta import ECS_VERSION
@@ -112,6 +113,34 @@ class StdlibFormatter(logging.Formatter):
         self._exclude_fields = frozenset(exclude_fields)
         self._stack_trace_limit = stack_trace_limit
 
+    def _record_error_type(self, record):
+        # type: (logging.LogRecord) -> Optional[str]
+        exc_info = record.exc_info
+        if not exc_info:
+            # exc_info is either an iterable or bool. If it doesn't
+            # evaluate to True, then no error type is used.
+            return None
+        if isinstance(exc_info, bool):
+            # if it is a bool, then look at sys.exc_info
+            exc_info = sys.exc_info()
+        if isinstance(exc_info, (list, tuple)) and exc_info[0] is not None:
+            return exc_info[0].__name__
+        return None
+
+    def _record_error_message(self, record):
+        # type: (logging.LogRecord) -> Optional[str]
+        exc_info = record.exc_info
+        if not exc_info:
+            # exc_info is either an iterable or bool. If it doesn't
+            # evaluate to True, then no error message is used.
+            return None
+        if isinstance(exc_info, bool):
+            # if it is a bool, then look at sys.exc_info
+            exc_info = sys.exc_info()
+        if isinstance(exc_info, (list, tuple)) and exc_info[1]:
+            return str(exc_info[1])
+        return None
+
     def format(self, record):
         # type: (logging.LogRecord) -> str
         result = self.format_to_ecs(record)
@@ -145,14 +174,8 @@ class StdlibFormatter(logging.Formatter):
             "process.name": self._record_attribute("processName"),
             "process.thread.id": self._record_attribute("thread"),
             "process.thread.name": self._record_attribute("threadName"),
-            "error.type": lambda r: (
-                r.exc_info[0].__name__
-                if (r.exc_info is not None and r.exc_info[0] is not None)
-                else None
-            ),
-            "error.message": lambda r: (
-                str(r.exc_info[1]) if r.exc_info and r.exc_info[1] else None
-            ),
+            "error.type": self._record_error_type,
+            "error.message": self._record_error_message,
             "error.stack_trace": self._record_error_stack_trace,
         }  # type: Dict[str, Callable[[logging.LogRecord],Any]]
 
