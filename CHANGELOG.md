@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.0.1 (2021-07-06)
 
 * Fixed an issue in `StructlogFormatter` caused by a conflict with `event`
   (used for the log `message`) and `event.dataset` (a field provided by the
