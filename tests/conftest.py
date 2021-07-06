@@ -19,12 +19,19 @@ import datetime
 import json
 import os
 import collections
+import sys
+import logging
+import elasticapm
 
 import pytest
 
 
 class ValidationError(Exception):
     pass
+
+
+if sys.version_info[0] >= 3:
+    basestring = str
 
 
 @pytest.fixture
@@ -81,3 +88,16 @@ def spec_validator():
         return data_json
 
     return validator
+
+
+@pytest.fixture
+def apm():
+    if sys.version_info < (3, 6):
+        pytest.skip("elasticapm only supports python 3.6+")
+    if sys.version_info[0] >= 3:
+        record_factory = logging.getLogRecordFactory()
+    apm = elasticapm.Client({"SERVICE_NAME": "apm-service", "DISABLE_SEND": True})
+    yield apm
+    apm.close()
+    if sys.version_info[0] >= 3:
+        logging.setLogRecordFactory(record_factory)
