@@ -71,8 +71,16 @@ class StdlibFormatter(logging.Formatter):
     } | _LOGRECORD_DIR
     converter = time.gmtime
 
-    def __init__(self, stack_trace_limit=None, exclude_fields=()):
-        # type: (Any, Optional[int], Sequence[str]) -> None
+    def __init__(
+        self,
+        fmt=None,
+        datefmt=None,
+        style="%",
+        validate=True,
+        stack_trace_limit=None,
+        exclude_fields=(),
+    ):
+        # type: (Any, Optional[str], Optional[str], str, bool, Optional[int], Sequence[str]) -> None
         """Initialize the ECS formatter.
 
         :param int stack_trace_limit:
@@ -91,7 +99,9 @@ class StdlibFormatter(logging.Formatter):
 
                 exclude_keys=["error"]
         """
-        super(StdlibFormatter, self).__init__()
+        super(StdlibFormatter, self).__init__(
+            fmt=fmt, datefmt=datefmt, style=style, validate=validate
+        )
 
         if stack_trace_limit is not None:
             if not isinstance(stack_trace_limit, int):
