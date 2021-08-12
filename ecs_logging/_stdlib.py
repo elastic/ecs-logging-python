@@ -103,7 +103,7 @@ class StdlibFormatter(logging.Formatter):
         if validate is not None:
             # validate was introduced in py3.8 so we need to only provide it if the user provided it
             _kwargs["validate"] = validate
-        super(StdlibFormatter, self).__init__(
+        super(StdlibFormatter, self).__init__(  # type: ignore[call-arg]
             fmt=fmt, datefmt=datefmt, style=style, **_kwargs
         )
 
