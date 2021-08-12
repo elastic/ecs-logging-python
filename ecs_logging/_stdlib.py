@@ -76,11 +76,11 @@ class StdlibFormatter(logging.Formatter):
         fmt=None,
         datefmt=None,
         style="%",
-        validate=True,
+        validate=None,
         stack_trace_limit=None,
         exclude_fields=(),
     ):
-        # type: (Any, Optional[str], Optional[str], str, bool, Optional[int], Sequence[str]) -> None
+        # type: (Any, Optional[str], Optional[str], str, Optional[bool], Optional[int], Sequence[str]) -> None
         """Initialize the ECS formatter.
 
         :param int stack_trace_limit:
@@ -99,8 +99,12 @@ class StdlibFormatter(logging.Formatter):
 
                 exclude_keys=["error"]
         """
+        _kwargs = {}
+        if validate is not None:
+            # validate was introduced in py3.8 so we need to only provide it if the user provided it
+            _kwargs["validate"] = validate
         super(StdlibFormatter, self).__init__(
-            fmt=fmt, datefmt=datefmt, style=style, validate=validate
+            fmt=fmt, datefmt=datefmt, style=style, **_kwargs
         )
 
         if stack_trace_limit is not None:
