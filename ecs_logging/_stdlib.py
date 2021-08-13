@@ -71,8 +71,16 @@ class StdlibFormatter(logging.Formatter):
     } | _LOGRECORD_DIR
     converter = time.gmtime
 
-    def __init__(self, stack_trace_limit=None, exclude_fields=()):
-        # type: (Any, Optional[int], Sequence[str]) -> None
+    def __init__(
+        self,
+        fmt=None,
+        datefmt=None,
+        style="%",
+        validate=None,
+        stack_trace_limit=None,
+        exclude_fields=(),
+    ):
+        # type: (Any, Optional[str], Optional[str], str, Optional[bool], Optional[int], Sequence[str]) -> None
         """Initialize the ECS formatter.
 
         :param int stack_trace_limit:
@@ -91,7 +99,18 @@ class StdlibFormatter(logging.Formatter):
 
                 exclude_keys=["error"]
         """
-        super(StdlibFormatter, self).__init__()
+        _kwargs = {}
+        if validate is not None:
+            # validate was introduced in py3.8 so we need to only provide it if the user provided it
+            _kwargs["validate"] = validate
+        if sys.version_info < (3, 0):  # Different args in py2.7
+            super(StdlibFormatter, self).__init__(  # type: ignore[call-arg]
+                fmt=fmt, datefmt=datefmt
+            )
+        else:
+            super(StdlibFormatter, self).__init__(  # type: ignore[call-arg]
+                fmt=fmt, datefmt=datefmt, style=style, **_kwargs
+            )
 
         if stack_trace_limit is not None:
             if not isinstance(stack_trace_limit, int):

@@ -50,4 +50,10 @@ def lint(session):
     session.install("flake8", "black", "mypy")
     session.run("black", "--check", "--target-version=py27", *SOURCE_FILES)
     session.run("flake8", "--ignore=E501,W503", *SOURCE_FILES)
-    session.run("mypy", "--strict", "ecs_logging/")
+    session.run(
+        "mypy",
+        "--strict",
+        "--show-error-codes",
+        "--no-warn-unused-ignores",
+        "ecs_logging/",
+    )

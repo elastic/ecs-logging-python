@@ -16,6 +16,7 @@
 # under the License.
 
 import logging
+import logging.config
 import mock
 import pytest
 import json
@@ -327,3 +328,12 @@ def test_stack_info_excluded(logger, exclude_fields):
 
     ecs = json.loads(stream.getvalue().rstrip())
     assert "error" not in ecs
+
+
+def test_stdlibformatter_signature():
+    logging.config.dictConfig(
+        {
+            "version": 1,
+            "formatters": {"my_formatter": {"class": "ecs_logging.StdlibFormatter"}},
+        }
+    )
