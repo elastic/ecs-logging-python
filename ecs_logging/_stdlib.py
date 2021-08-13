@@ -103,9 +103,14 @@ class StdlibFormatter(logging.Formatter):
         if validate is not None:
             # validate was introduced in py3.8 so we need to only provide it if the user provided it
             _kwargs["validate"] = validate
-        super(StdlibFormatter, self).__init__(  # type: ignore[call-arg]
-            fmt=fmt, datefmt=datefmt, style=style, **_kwargs
-        )
+        if sys.version_info < (3, 0):  # Different args in py2.7
+            super(StdlibFormatter, self).__init__(  # type: ignore[call-arg]
+                fmt=fmt, datefmt=datefmt
+            )
+        else:
+            super(StdlibFormatter, self).__init__(  # type: ignore[call-arg]
+                fmt=fmt, datefmt=datefmt, style=style, **_kwargs
+            )
 
         if stack_trace_limit is not None:
             if not isinstance(stack_trace_limit, int):
