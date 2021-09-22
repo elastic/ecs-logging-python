@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.2 (2021-09-22)
+
+* Fix an signature mismatch between `StdLibFormatter` and `logging.Formatter`,
+  which could cause issues in Django and Gunicorn
+  ([#54](https://github.com/elastic/ecs-logging-python/pull/54))
+
 ## 1.0.1 (2021-07-06)
 
 * Fixed an issue in `StructlogFormatter` caused by a conflict with `event`

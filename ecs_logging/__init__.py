@@ -20,7 +20,7 @@ from ._meta import ECS_VERSION
 from ._stdlib import StdlibFormatter
 from ._structlog import StructlogFormatter
 
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 __all__ = [
     "ECS_VERSION",
     "StdlibFormatter",
