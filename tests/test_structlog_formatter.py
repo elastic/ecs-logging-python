@@ -31,7 +31,7 @@ class NotSerializable:
 def make_event_dict():
     return {
         "event": "test message",
-        "event.dataset": "agent.log",
+        "event.dataset": "agent",
         "log.logger": "logger-name",
         "foo": "bar",
         "baz": NotSerializable(),
@@ -56,7 +56,7 @@ def test_event_dict_formatted(time, spec_validator):
         '"message":"test message",'
         '"baz":"<NotSerializable>",'
         '"ecs":{"version":"1.6.0"},'
-        '"event":{"dataset":"agent.log"},'
+        '"event":{"dataset":"agent"},'
         '"foo":"bar",'
         '"log":{"logger":"logger-name"}}'
     )
