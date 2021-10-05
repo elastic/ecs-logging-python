@@ -78,6 +78,7 @@ class StdlibFormatter(logging.Formatter):
         style="%",
         validate=None,
         stack_trace_limit=None,
+        extra=None,
         exclude_fields=(),
     ):
         # type: (Any, Optional[str], Optional[str], str, Optional[bool], Optional[int], Sequence[str]) -> None
@@ -129,6 +130,7 @@ class StdlibFormatter(logging.Formatter):
         ):
             raise TypeError("'exclude_fields' must be a sequence of strings")
 
+        self._extra = extra
         self._exclude_fields = frozenset(exclude_fields)
         self._stack_trace_limit = stack_trace_limit
 
@@ -218,6 +220,10 @@ class StdlibFormatter(logging.Formatter):
         # since they can be defined as 'extras={"http": {"method": "GET"}}'
         extra_keys = set(available).difference(self._LOGRECORD_DICT)
         extras = flatten_dict({key: available[key] for key in extra_keys})
+        # Merge in any global extra's
+        if self._extra is not None:
+            for field, value in self._extra.items():
+                merge_dicts(de_dot(field, value), extras)
 
         # Pop all Elastic APM extras and add them
         # to standard tracing ECS fields.
