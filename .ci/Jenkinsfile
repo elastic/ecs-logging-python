@@ -23,6 +23,8 @@ pipeline {
     issueCommentTrigger("${obltGitHubComments()}")
     // Only master branch will run on a timer basis
     cron(env.BRANCH_NAME == 'master' ? '@daily' : '')
+    // enable upstream trigger for the master branch only
+    upstream("/apm-agent-python/apm-agent-python-mbp/${ env.JOB_BASE_NAME.equals('master') ? 'master' : 'none' }")
   }
   stages {
     stage('Checkout') {
@@ -32,6 +34,7 @@ pipeline {
         deleteDir()
         gitCheckout(basedir: "${BASE_DIR}", githubNotifyFirstTimeContributor: true)
         stash allowEmpty: true, name: 'source', useDefaultExcludes: false
+        setEnvVar('ELASTIC_AGENT_PYTHON_BRANCH', isUpstreamTrigger(filter: 'apm-agent-python-mbp/master') ? 'master' : 'default')
       }
     }
     stage('Lint') {

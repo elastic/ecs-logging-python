@@ -16,6 +16,7 @@
 # under the License.
 
 import nox
+import os
 
 
 SOURCE_FILES = ("noxfile.py", "tests/", "ecs_logging/")
@@ -23,6 +24,12 @@ SOURCE_FILES = ("noxfile.py", "tests/", "ecs_logging/")
 
 def tests_impl(session):
     session.install(".[develop]")
+    session.install(
+        ".[{0}]".format(
+            os.environ.get("ELASTIC_AGENT_PYTHON_BRANCH", "default").lower()
+        )
+    )
+
     session.run(
         "pytest",
         "--junitxml=junit-test.xml",
