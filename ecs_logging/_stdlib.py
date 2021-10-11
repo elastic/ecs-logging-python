@@ -81,7 +81,7 @@ class StdlibFormatter(logging.Formatter):
         extra=None,
         exclude_fields=(),
     ):
-        # type: (Any, Optional[str], Optional[str], str, Optional[bool], Optional[int], Sequence[str]) -> None
+        # type: (Any, Optional[str], Optional[str], str, Optional[bool], Optional[int], Dict[str], Sequence[str]) -> None
         """Initialize the ECS formatter.
 
         :param int stack_trace_limit:
@@ -90,6 +90,8 @@ class StdlibFormatter(logging.Formatter):
             Setting this to zero will suppress stack traces.
             This setting doesn't affect ``LogRecord.stack_info`` because
             this attribute is typically already pre-formatted.
+        :param Dict[str] extra:
+            Specifies the collection of meta-data fields to add to all records.
         :param Sequence[str] exclude_fields:
             Specifies any fields that should be suppressed from the resulting
             fields, expressed with dot notation::
