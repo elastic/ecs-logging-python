@@ -221,11 +221,13 @@ class StdlibFormatter(logging.Formatter):
 
         # Pop all Elastic APM extras and add them
         # to standard tracing ECS fields.
-        extras["span.id"] = extras.pop("elasticapm_span_id", None)
-        extras["transaction.id"] = extras.pop("elasticapm_transaction_id", None)
-        extras["trace.id"] = extras.pop("elasticapm_trace_id", None)
-        extras["service.name"] = extras.pop("elasticapm_service_name", None)
-        extras["event.dataset"] = extras.pop("elasticapm_event_dataset", None)
+        extras.setdefault("span.id", extras.pop("elasticapm_span_id", None))
+        extras.setdefault(
+            "transaction.id", extras.pop("elasticapm_transaction_id", None)
+        )
+        extras.setdefault("trace.id", extras.pop("elasticapm_trace_id", None))
+        extras.setdefault("service.name", extras.pop("elasticapm_service_name", None))
+        extras.setdefault("event.dataset", extras.pop("elasticapm_event_dataset", None))
 
         # Merge in any keys that were set within 'extra={...}'
         for field, value in extras.items():
