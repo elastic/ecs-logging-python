@@ -72,16 +72,16 @@ class StdlibFormatter(logging.Formatter):
     converter = time.gmtime
 
     def __init__(
-        self,
-        fmt=None,
-        datefmt=None,
-        style="%",
-        validate=None,
-        stack_trace_limit=None,
-        extra=None,
-        exclude_fields=(),
+        self,  # type: Any
+        fmt=None,  # type: Optional[str]
+        datefmt=None,  # type: Optional[str]
+        style="%",  # type: str
+        validate=None,  # type: Optional[bool]
+        stack_trace_limit=None,  # type: Optional[int]
+        extra=None,  # type: Optional[Dict[Any, Any]]
+        exclude_fields=(),  # type: Sequence[str]
     ):
-        # type: (Any, Optional[str], Optional[str], str, Optional[bool], Optional[int], Dict[str], Sequence[str]) -> None
+        # type: (...) -> None
         """Initialize the ECS formatter.
 
         :param int stack_trace_limit:
