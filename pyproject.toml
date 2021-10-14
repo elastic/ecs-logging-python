@@ -35,7 +35,7 @@ develop = [
     "pytest-cov",
     "mock",
     "structlog",
-    "elastic-apm",
+    "elastic-apm @ https://github.com/elastic/apm-agent-python/archive/master.zip",
 ]
 
 [tool.flit.metadata.urls]
