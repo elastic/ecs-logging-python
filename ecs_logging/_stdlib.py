@@ -227,7 +227,6 @@ class StdlibFormatter(logging.Formatter):
         )
         extras.setdefault("trace.id", extras.pop("elasticapm_trace_id", None))
         extras.setdefault("service.name", extras.pop("elasticapm_service_name", None))
-        extras.setdefault("event.dataset", extras.pop("elasticapm_event_dataset", None))
 
         # Merge in any keys that were set within 'extra={...}'
         for field, value in extras.items():

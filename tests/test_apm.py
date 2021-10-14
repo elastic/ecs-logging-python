@@ -56,7 +56,6 @@ def test_elasticapm_structlog_log_correlation_ecs_fields(spec_validator, apm):
         "trace": {"id": trace_id},
         "transaction": {"id": transaction_id},
         "service": {"name": "apm-service"},
-        "event": {"dataset": "apm-service"},
     }
 
 
@@ -100,7 +99,6 @@ def test_elastic_apm_stdlib_no_filter_log_correlation_ecs_fields(apm):
         "trace": {"id": trace_id},
         "transaction": {"id": transaction_id},
         "service": {"name": "apm-service"},
-        "event": {"dataset": "apm-service"},
     }
 
 
@@ -145,7 +143,6 @@ def test_elastic_apm_stdlib_with_filter_log_correlation_ecs_fields(apm):
         "trace": {"id": trace_id},
         "transaction": {"id": transaction_id},
         "service": {"name": "apm-service"},
-        "event": {"dataset": "apm-service"},
     }
 
 
@@ -191,5 +188,4 @@ def test_elastic_apm_stdlib_exclude_fields(apm):
         "message": "test message",
         "trace": {"id": trace_id},
         "service": {"name": "apm-service"},
-        "event": {"dataset": "apm-service"},
     }
