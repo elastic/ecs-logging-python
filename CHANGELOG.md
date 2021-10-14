@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+* Remove python 3.5 support [#69]
+
 ## 1.0.2 (2021-09-22)
 
 * Fix an signature mismatch between `StdLibFormatter` and `logging.Formatter`,
