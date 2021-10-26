@@ -34,6 +34,10 @@ develop = [
     "pytest-cov",
     "mock",
     "structlog",
+    "elastic-apm",
+]
+
+master = [
     "elastic-apm @ https://github.com/elastic/apm-agent-python/archive/master.zip",
 ]
 

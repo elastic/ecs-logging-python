@@ -23,6 +23,7 @@ SOURCE_FILES = ("noxfile.py", "tests/", "ecs_logging/")
 
 def tests_impl(session):
     session.install(".[develop]")
+    session.install(".[master]")
     session.run(
         "pytest",
         "--junitxml=junit-test.xml",
