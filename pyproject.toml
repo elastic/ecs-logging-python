@@ -37,10 +37,6 @@ develop = [
     "elastic-apm",
 ]
 
-master = [
-    "elastic-apm @ https://github.com/elastic/apm-agent-python/archive/master.zip",
-]
-
 [tool.flit.metadata.urls]
 "Source" = "https://github.com/elastic/ecs-logging-python"
 "Download" = "https://github.com/elastic/ecs-logging-python/releases"
