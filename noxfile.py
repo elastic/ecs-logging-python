@@ -23,6 +23,10 @@ SOURCE_FILES = ("noxfile.py", "tests/", "ecs_logging/")
 
 def tests_impl(session):
     session.install(".[develop]")
+    # Install `elastic-apm` from master branch
+    session.install(
+        "elastic-apm @ https://github.com/elastic/apm-agent-python/archive/master.zip"
+    )
     session.run(
         "pytest",
         "--junitxml=junit-test.xml",
