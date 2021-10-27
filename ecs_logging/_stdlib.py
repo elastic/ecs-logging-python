@@ -90,7 +90,7 @@ class StdlibFormatter(logging.Formatter):
             Setting this to zero will suppress stack traces.
             This setting doesn't affect ``LogRecord.stack_info`` because
             this attribute is typically already pre-formatted.
-        :param Dict[str] extra:
+        :param Optional[Dict[str, Any]] extra:
             Specifies the collection of meta-data fields to add to all records.
         :param Sequence[str] exclude_fields:
             Specifies any fields that should be suppressed from the resulting
