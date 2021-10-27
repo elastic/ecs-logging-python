@@ -78,7 +78,7 @@ class StdlibFormatter(logging.Formatter):
         style="%",  # type: str
         validate=None,  # type: Optional[bool]
         stack_trace_limit=None,  # type: Optional[int]
-        extra=None,  # type: Optional[Dict[Any, Any]]
+        extra=None,  # type: Optional[Dict[str, Any]]
         exclude_fields=(),  # type: Sequence[str]
     ):
         # type: (...) -> None
