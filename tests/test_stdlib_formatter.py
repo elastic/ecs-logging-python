@@ -349,3 +349,15 @@ def test_stdlibformatter_signature():
             "formatters": {"my_formatter": {"class": "ecs_logging.StdlibFormatter"}},
         }
     )
+
+
+def test_apm_data_conflicts(spec_validator):
+    record = make_record()
+    record.service = {"version": "1.0.0", "name": "myapp", "environment": "dev"}
+    formatter = ecs_logging.StdlibFormatter(exclude_fields=["process"])
+
+    assert spec_validator(formatter.format(record)) == (
+        '{"@timestamp":"2020-03-20T14:12:46.123Z","log.level":"debug","message":"1: hello","ecs":{"version":"1.6.0"},'
+        '"log":{"logger":"logger-name","origin":{"file":{"line":10,"name":"file.py"},"function":"test_function"},'
+        '"original":"1: hello"},"service":{"environment":"dev","name":"myapp","version":"1.0.0"}}'
+    )

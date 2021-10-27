@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.1.0 (2021-10-18)
+
+* Remove python 3.5 support ([#69](https://github.com/elastic/ecs-logging-python/pull/69))
+* Fix an issue where APM fields would override user-provided fields even when
+  APM wasn't installed ([#67](https://github.com/elastic/ecs-logging-python/pull/67))
+* Removed `event.dataset` field handling to match
+  [`elastic-apm` v6.6.0](https://github.com/elastic/apm-agent-python/releases/tag/v6.6.0)
+  ([#69](https://github.com/elastic/ecs-logging-python/pull/69))
+
 ## 1.0.2 (2021-09-22)
 
 * Fix an signature mismatch between `StdLibFormatter` and `logging.Formatter`,

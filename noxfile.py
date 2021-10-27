@@ -16,7 +16,6 @@
 # under the License.
 
 import nox
-import os
 
 
 SOURCE_FILES = ("noxfile.py", "tests/", "ecs_logging/")
@@ -24,12 +23,10 @@ SOURCE_FILES = ("noxfile.py", "tests/", "ecs_logging/")
 
 def tests_impl(session):
     session.install(".[develop]")
+    # Install `elastic-apm` from master branch
     session.install(
-        ".[{0}]".format(
-            os.environ.get("ELASTIC_AGENT_PYTHON_BRANCH", "default").lower()
-        )
+        "elastic-apm @ https://github.com/elastic/apm-agent-python/archive/master.zip"
     )
-
     session.run(
         "pytest",
         "--junitxml=junit-test.xml",
@@ -39,7 +36,7 @@ def tests_impl(session):
     )
 
 
-@nox.session(python=["2.7", "3.5", "3.6", "3.7", "3.8"])
+@nox.session(python=["2.7", "3.6", "3.7", "3.8"])
 def test(session):
     tests_impl(session)
 
