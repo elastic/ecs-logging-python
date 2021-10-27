@@ -72,15 +72,16 @@ class StdlibFormatter(logging.Formatter):
     converter = time.gmtime
 
     def __init__(
-        self,
-        fmt=None,
-        datefmt=None,
-        style="%",
-        validate=None,
-        stack_trace_limit=None,
-        exclude_fields=(),
+        self,  # type: Any
+        fmt=None,  # type: Optional[str]
+        datefmt=None,  # type: Optional[str]
+        style="%",  # type: str
+        validate=None,  # type: Optional[bool]
+        stack_trace_limit=None,  # type: Optional[int]
+        extra=None,  # type: Optional[Dict[str, Any]]
+        exclude_fields=(),  # type: Sequence[str]
     ):
-        # type: (Any, Optional[str], Optional[str], str, Optional[bool], Optional[int], Sequence[str]) -> None
+        # type: (...) -> None
         """Initialize the ECS formatter.
 
         :param int stack_trace_limit:
@@ -89,6 +90,8 @@ class StdlibFormatter(logging.Formatter):
             Setting this to zero will suppress stack traces.
             This setting doesn't affect ``LogRecord.stack_info`` because
             this attribute is typically already pre-formatted.
+        :param Optional[Dict[str, Any]] extra:
+            Specifies the collection of meta-data fields to add to all records.
         :param Sequence[str] exclude_fields:
             Specifies any fields that should be suppressed from the resulting
             fields, expressed with dot notation::
@@ -129,6 +132,7 @@ class StdlibFormatter(logging.Formatter):
         ):
             raise TypeError("'exclude_fields' must be a sequence of strings")
 
+        self._extra = extra
         self._exclude_fields = frozenset(exclude_fields)
         self._stack_trace_limit = stack_trace_limit
 
@@ -218,6 +222,10 @@ class StdlibFormatter(logging.Formatter):
         # since they can be defined as 'extras={"http": {"method": "GET"}}'
         extra_keys = set(available).difference(self._LOGRECORD_DICT)
         extras = flatten_dict({key: available[key] for key in extra_keys})
+        # Merge in any global extra's
+        if self._extra is not None:
+            for field, value in self._extra.items():
+                merge_dicts(de_dot(field, value), extras)
 
         # Pop all Elastic APM extras and add them
         # to standard tracing ECS fields.

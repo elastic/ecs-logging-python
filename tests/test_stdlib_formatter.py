@@ -26,7 +26,6 @@ import sys
 import ecs_logging
 from .compat import StringIO
 
-
 requires_py3 = pytest.mark.skipif(
     sys.version_info[0] < 3, reason="Test requires Python 3.x+"
 )
@@ -58,6 +57,19 @@ def test_record_formatted(spec_validator):
 
     assert spec_validator(formatter.format(make_record())) == (
         '{"@timestamp":"2020-03-20T14:12:46.123Z","log.level":"debug","message":"1: hello","ecs":{"version":"1.6.0"},'
+        '"log":{"logger":"logger-name","origin":{"file":{"line":10,"name":"file.py"},"function":"test_function"},'
+        '"original":"1: hello"}}'
+    )
+
+
+def test_extra_global_is_merged(spec_validator):
+    formatter = ecs_logging.StdlibFormatter(
+        exclude_fields=["process"], extra={"environment": "dev"}
+    )
+
+    assert spec_validator(formatter.format(make_record())) == (
+        '{"@timestamp":"2020-03-20T14:12:46.123Z","log.level":"debug","message":"1: hello","ecs":{"version":"1.6.0"},'
+        '"environment":"dev",'
         '"log":{"logger":"logger-name","origin":{"file":{"line":10,"name":"file.py"},"function":"test_function"},'
         '"original":"1: hello"}}'
     )
