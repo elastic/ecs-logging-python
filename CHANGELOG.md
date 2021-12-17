@@ -29,7 +29,7 @@
 
 ## 0.6.0 (2021-01-21)
 
-* Add validation against the ecs-logging [spec](https://github.com/elastic/ecs-logging/blob/master/spec/spec.json) ([#31](https://github.com/elastic/ecs-logging-python/pull/31))
+* Add validation against the ecs-logging [spec](https://github.com/elastic/ecs-logging/blob/main/spec/spec.json) ([#31](https://github.com/elastic/ecs-logging-python/pull/31))
 * Add support for `service.name` from APM log correlation ([#32](https://github.com/elastic/ecs-logging-python/pull/32))
 * Correctly order `@timestamp`, `log.level`, and `message` fields ([#28](https://github.com/elastic/ecs-logging-python/pull/28))
 

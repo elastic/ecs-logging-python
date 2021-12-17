@@ -21,8 +21,8 @@ pipeline {
   }
   triggers {
     issueCommentTrigger("${obltGitHubComments()}")
-    // Only master branch will run on a timer basis
-    cron(env.BRANCH_NAME == 'master' ? '@daily' : '')
+    // Only main branch will run on a timer basis
+    cron(env.BRANCH_NAME == 'main' ? '@daily' : '')
   }
   stages {
     stage('Checkout') {
