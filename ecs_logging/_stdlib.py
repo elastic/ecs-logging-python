@@ -34,7 +34,7 @@ if TYPE_CHECKING:
     from typing import Optional, Any, Callable, Dict, Sequence
 
     try:
-        from typing import Literal, Union
+        from typing import Literal, Union  # type: ignore
     except ImportError:
         from typing_extensions import Literal, Union  # type: ignore
 
