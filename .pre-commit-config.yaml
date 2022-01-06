@@ -15,7 +15,7 @@ repos:
     rev: v0.910
     hooks:
     -   id: mypy
-        args: [--strict, --show-error-codes, --no-warn-unused-ignores]
+        args: [--strict, --show-error-codes, --no-warn-unused-ignores, --implicit-reexport]
 -   repo: https://github.com/ambv/black
     rev: 21.6b0
     hooks:
