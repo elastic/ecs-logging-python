@@ -33,6 +33,11 @@ from ._utils import (
 if TYPE_CHECKING:
     from typing import Optional, Any, Callable, Dict, Sequence
 
+    try:
+        from typing import Literal, Union  # type: ignore
+    except ImportError:
+        from typing_extensions import Literal, Union  # type: ignore
+
 
 # Load the attributes of a LogRecord so if some are
 # added in the future we won't mistake them for 'extra=...'
@@ -75,7 +80,7 @@ class StdlibFormatter(logging.Formatter):
         self,  # type: Any
         fmt=None,  # type: Optional[str]
         datefmt=None,  # type: Optional[str]
-        style="%",  # type: str
+        style="%",  # type: Union[Literal["%"], Literal["{"], Literal["$"]]
         validate=None,  # type: Optional[bool]
         stack_trace_limit=None,  # type: Optional[int]
         extra=None,  # type: Optional[Dict[str, Any]]
