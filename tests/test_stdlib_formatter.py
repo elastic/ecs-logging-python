@@ -17,7 +17,7 @@
 
 import logging
 import logging.config
-import mock
+from unittest import mock
 import pytest
 import json
 import time
@@ -29,7 +29,7 @@ from io import StringIO
 
 @pytest.fixture(scope="function")
 def logger():
-    return logging.getLogger("test-logger-%f-%f" % (time.time(), random.random()))
+    return logging.getLogger(f"test-logger-{time.time():f}-{random.random():f}")
 
 
 def make_record():
@@ -74,7 +74,7 @@ def test_extra_global_is_merged(spec_validator):
 def test_can_be_overridden(spec_validator):
     class CustomFormatter(ecs_logging.StdlibFormatter):
         def format_to_ecs(self, record):
-            ecs_dict = super(CustomFormatter, self).format_to_ecs(record)
+            ecs_dict = super().format_to_ecs(record)
             ecs_dict["custom"] = "field"
             return ecs_dict
 

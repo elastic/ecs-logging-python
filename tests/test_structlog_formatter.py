@@ -17,7 +17,7 @@
 
 import ecs_logging
 import structlog
-import mock
+from unittest import mock
 from io import StringIO
 
 import pytest

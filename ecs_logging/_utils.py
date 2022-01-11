@@ -62,17 +62,15 @@ def flatten_dict(value):
     for key, val in value.items():
         if not isinstance(val, collections_abc.Mapping):
             if key in top_level:
-                raise ValueError(
-                    "Duplicate entry for '%s' with different nesting" % key
-                )
+                raise ValueError(f"Duplicate entry for '{key}' with different nesting")
             top_level[key] = val
         else:
             val = flatten_dict(val)
             for vkey, vval in val.items():
-                vkey = "%s.%s" % (key, vkey)
+                vkey = f"{key}.{vkey}"
                 if vkey in top_level:
                     raise ValueError(
-                        "Duplicate entry for '%s' with different nesting" % vkey
+                        f"Duplicate entry for '{vkey}' with different nesting"
                     )
                 top_level[vkey] = vval
 
@@ -163,16 +161,9 @@ def json_dumps(value):
         # Need to call json.dumps() on values just in
         # case the given values aren't strings (even though
         # they should be according to the spec)
-        ordered_json = ",".join(
-            '"%s":%s'
-            % (
-                k,
-                json_dumps(v),
-            )
-            for k, v in ordered_fields
-        )
+        ordered_json = ",".join(f'"{k}":{json_dumps(v)}' for k, v in ordered_fields)
         if value:
-            return "{%s,%s" % (
+            return "{{{},{}".format(
                 ordered_json,
                 json_dumps(value)[1:],
             )

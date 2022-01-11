@@ -32,9 +32,7 @@ class ValidationError(Exception):
 
 @pytest.fixture
 def spec_validator():
-    with open(
-        os.path.join(os.path.dirname(__file__), "resources", "spec.json"), "r"
-    ) as fh:
+    with open(os.path.join(os.path.dirname(__file__), "resources", "spec.json")) as fh:
         spec = json.load(fh)
 
     def validator(data_json):
@@ -59,11 +57,11 @@ def spec_validator():
                     if subval:
                         found = True
                 if not found:
-                    raise ValidationError("Missing required key {}".format(k))
+                    raise ValidationError(f"Missing required key {k}")
             if k in data:
                 if v["type"] == "string" and not isinstance(data[k], str):
                     raise ValidationError(
-                        "Value {0} for key {1} should be string, is {2}".format(
+                        "Value {} for key {} should be string, is {}".format(
                             data[k], k, type(data[k])
                         )
                     )
@@ -72,12 +70,12 @@ def spec_validator():
                         datetime.datetime.strptime(data[k], "%Y-%m-%dT%H:%M:%S.%fZ")
                     except ValueError:
                         raise ValidationError(
-                            "Value {0} for key {1} doesn't parse as an ISO datetime".format(
+                            "Value {} for key {} doesn't parse as an ISO datetime".format(
                                 data[k], k
                             )
                         )
             if v.get("index") and list(data.keys())[v.get("index")] != k:
-                raise ValidationError("Key {0} is not at index {1}".format(k, index))
+                raise ValidationError(f"Key {k} is not at index {index}")
 
         return data_json
 
