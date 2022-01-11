@@ -307,7 +307,6 @@ def test_exclude_fields_type_and_values():
     assert str(e.value) == "'exclude_fields' must be a sequence of strings"
 
 
-@requires_py3
 def test_stack_info(logger):
     stream = BytesIO()
     handler = logging.StreamHandler(stream)
@@ -323,7 +322,6 @@ def test_stack_info(logger):
     assert "test_stack_info" in error_stack_trace and __file__ in error_stack_trace
 
 
-@requires_py3
 @pytest.mark.parametrize("exclude_fields", [["error"], ["error.stack_trace"]])
 def test_stack_info_excluded(logger, exclude_fields):
     stream = BytesIO()
