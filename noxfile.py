@@ -36,7 +36,7 @@ def tests_impl(session):
     )
 
 
-@nox.session(python=["2.7", "3.6", "3.7", "3.8"])
+@nox.session(python=["3.6", "3.7", "3.8", "3.9", "3.10"])
 def test(session):
     tests_impl(session)
 
@@ -44,7 +44,7 @@ def test(session):
 @nox.session()
 def blacken(session):
     session.install("black")
-    session.run("black", "--target-version=py27", *SOURCE_FILES)
+    session.run("black", "--target-version=py36", *SOURCE_FILES)
 
     lint(session)
 
@@ -52,7 +52,7 @@ def blacken(session):
 @nox.session
 def lint(session):
     session.install("flake8", "black", "mypy")
-    session.run("black", "--check", "--target-version=py27", *SOURCE_FILES)
+    session.run("black", "--check", "--target-version=py36", *SOURCE_FILES)
     session.run("flake8", "--ignore=E501,W503", *SOURCE_FILES)
     session.run(
         "mypy",

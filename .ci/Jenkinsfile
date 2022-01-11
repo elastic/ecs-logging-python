@@ -55,7 +55,7 @@ pipeline {
         axes {
           axis {
             name 'VERSION'
-            values '2.7', '3.6', '3.7', '3.8'
+            values '3.6', '3.7', '3.8', '3.9', '3.10'
           }
         }
         stages {
@@ -88,7 +88,7 @@ pipeline {
 }
 
 def python(Map v = [:], body) {
-  def dockerImage = v.version.equals('2.7') ? 'python:3.7' : "python:${v.version}"
+  def dockerImage = "python:${v.version}"
   // If dockerhub got issues then let's retry twice
   retry(2) {
     sleep 5

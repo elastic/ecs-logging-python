@@ -30,10 +30,6 @@ class ValidationError(Exception):
     pass
 
 
-if sys.version_info[0] >= 3:
-    basestring = str
-
-
 @pytest.fixture
 def spec_validator():
     with open(
@@ -65,9 +61,7 @@ def spec_validator():
                 if not found:
                     raise ValidationError("Missing required key {}".format(k))
             if k in data:
-                if v["type"] == "string" and not (
-                    isinstance(data[k], str) or isinstance(data[k], basestring)
-                ):
+                if v["type"] == "string" and not isinstance(data[k], str):
                     raise ValidationError(
                         "Value {0} for key {1} should be string, is {2}".format(
                             data[k], k, type(data[k])
@@ -92,12 +86,8 @@ def spec_validator():
 
 @pytest.fixture
 def apm():
-    if sys.version_info < (3, 6):
-        pytest.skip("elasticapm only supports python 3.6+")
-    if sys.version_info[0] >= 3:
-        record_factory = logging.getLogRecordFactory()
+    record_factory = logging.getLogRecordFactory()
     apm = elasticapm.Client({"SERVICE_NAME": "apm-service", "DISABLE_SEND": True})
     yield apm
     apm.close()
-    if sys.version_info[0] >= 3:
-        logging.setLogRecordFactory(record_factory)
+    logging.setLogRecordFactory(record_factory)

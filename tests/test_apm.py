@@ -24,11 +24,11 @@ import ecs_logging
 import logging
 import structlog
 import pytest
-from .compat import StringIO
+from io import BytesIO
 
 
 def test_elasticapm_structlog_log_correlation_ecs_fields(spec_validator, apm):
-    stream = StringIO()
+    stream = BytesIO()
     logger = structlog.PrintLogger(stream)
     logger = structlog.wrap_logger(
         logger, processors=[structlog_processor, ecs_logging.StructlogFormatter()]
@@ -60,7 +60,7 @@ def test_elasticapm_structlog_log_correlation_ecs_fields(spec_validator, apm):
 
 
 def test_elastic_apm_stdlib_no_filter_log_correlation_ecs_fields(apm):
-    stream = StringIO()
+    stream = BytesIO()
     logger = logging.getLogger("apm-logger")
     handler = logging.StreamHandler(stream)
     handler.setFormatter(
@@ -103,7 +103,7 @@ def test_elastic_apm_stdlib_no_filter_log_correlation_ecs_fields(apm):
 
 
 def test_elastic_apm_stdlib_with_filter_log_correlation_ecs_fields(apm):
-    stream = StringIO()
+    stream = BytesIO()
     logger = logging.getLogger("apm-logger")
     handler = logging.StreamHandler(stream)
     handler.setFormatter(
@@ -147,7 +147,7 @@ def test_elastic_apm_stdlib_with_filter_log_correlation_ecs_fields(apm):
 
 
 def test_elastic_apm_stdlib_exclude_fields(apm):
-    stream = StringIO()
+    stream = BytesIO()
     logger = logging.getLogger("apm-logger")
     handler = logging.StreamHandler(stream)
     handler.setFormatter(

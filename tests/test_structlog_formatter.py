@@ -18,7 +18,7 @@
 import ecs_logging
 import structlog
 import mock
-from .compat import StringIO
+from io import BytesIO
 
 import pytest
 
@@ -64,7 +64,7 @@ def test_event_dict_formatted(time, spec_validator):
 def test_can_be_set_as_processor(time, spec_validator):
     time.return_value = 1584720997.187709
 
-    stream = StringIO()
+    stream = BytesIO()
     structlog.configure(
         processors=[ecs_logging.StructlogFormatter()],
         wrapper_class=structlog.BoundLogger,
