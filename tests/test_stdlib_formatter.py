@@ -24,7 +24,7 @@ import time
 import random
 import sys
 import ecs_logging
-from io import BytesIO
+from io import StringIO
 
 
 @pytest.fixture(scope="function")
@@ -87,7 +87,7 @@ def test_can_be_overridden(spec_validator):
 
 
 def test_can_be_set_on_handler():
-    stream = BytesIO()
+    stream = StringIO()
     handler = logging.StreamHandler(stream)
     handler.setFormatter(ecs_logging.StdlibFormatter(exclude_fields=["process"]))
 
@@ -104,7 +104,7 @@ def test_can_be_set_on_handler():
 def test_extra_is_merged(time, logger):
     time.return_value = 1584720997.187709
 
-    stream = BytesIO()
+    stream = StringIO()
     handler = logging.StreamHandler(stream)
     handler.setFormatter(
         ecs_logging.StdlibFormatter(exclude_fields=["process", "tls.client"])
@@ -154,7 +154,7 @@ def test_stack_trace_limit_default(kwargs, logger):
     def h():
         raise ValueError("error!")
 
-    stream = BytesIO()
+    stream = StringIO()
     handler = logging.StreamHandler(stream)
     handler.setFormatter(ecs_logging.StdlibFormatter(**kwargs))
     logger.addHandler(handler)
@@ -172,7 +172,7 @@ def test_stack_trace_limit_default(kwargs, logger):
 
 @pytest.mark.parametrize("stack_trace_limit", [0, False])
 def test_stack_trace_limit_disabled(stack_trace_limit, logger):
-    stream = BytesIO()
+    stream = StringIO()
     handler = logging.StreamHandler(stream)
     handler.setFormatter(
         ecs_logging.StdlibFormatter(stack_trace_limit=stack_trace_limit)
@@ -193,7 +193,7 @@ def test_stack_trace_limit_disabled(stack_trace_limit, logger):
 
 
 def test_exc_info_false_does_not_raise(logger):
-    stream = BytesIO()
+    stream = StringIO()
     handler = logging.StreamHandler(stream)
     handler.setFormatter(ecs_logging.StdlibFormatter())
     logger.addHandler(handler)
@@ -217,7 +217,7 @@ def test_stack_trace_limit_traceback(logger):
     def h():
         raise ValueError("error!")
 
-    stream = BytesIO()
+    stream = StringIO()
     handler = logging.StreamHandler(stream)
     handler.setFormatter(ecs_logging.StdlibFormatter(stack_trace_limit=2))
     logger.addHandler(handler)
@@ -308,7 +308,7 @@ def test_exclude_fields_type_and_values():
 
 
 def test_stack_info(logger):
-    stream = BytesIO()
+    stream = StringIO()
     handler = logging.StreamHandler(stream)
     handler.setFormatter(ecs_logging.StdlibFormatter())
     logger.addHandler(handler)
@@ -324,7 +324,7 @@ def test_stack_info(logger):
 
 @pytest.mark.parametrize("exclude_fields", [["error"], ["error.stack_trace"]])
 def test_stack_info_excluded(logger, exclude_fields):
-    stream = BytesIO()
+    stream = StringIO()
     handler = logging.StreamHandler(stream)
     handler.setFormatter(ecs_logging.StdlibFormatter(exclude_fields=exclude_fields))
     logger.addHandler(handler)
