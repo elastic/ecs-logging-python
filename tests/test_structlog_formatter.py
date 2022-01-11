@@ -17,8 +17,8 @@
 
 import ecs_logging
 import structlog
-import mock
-from .compat import StringIO
+from unittest import mock
+from io import StringIO
 
 import pytest
 

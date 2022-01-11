@@ -17,23 +17,19 @@
 
 import logging
 import logging.config
-import mock
+from unittest import mock
 import pytest
 import json
 import time
 import random
 import sys
 import ecs_logging
-from .compat import StringIO
-
-requires_py3 = pytest.mark.skipif(
-    sys.version_info[0] < 3, reason="Test requires Python 3.x+"
-)
+from io import StringIO
 
 
 @pytest.fixture(scope="function")
 def logger():
-    return logging.getLogger("test-logger-%f-%f" % (time.time(), random.random()))
+    return logging.getLogger(f"test-logger-{time.time():f}-{random.random():f}")
 
 
 def make_record():
@@ -78,7 +74,7 @@ def test_extra_global_is_merged(spec_validator):
 def test_can_be_overridden(spec_validator):
     class CustomFormatter(ecs_logging.StdlibFormatter):
         def format_to_ecs(self, record):
-            ecs_dict = super(CustomFormatter, self).format_to_ecs(record)
+            ecs_dict = super().format_to_ecs(record)
             ecs_dict["custom"] = "field"
             return ecs_dict
 
@@ -311,7 +307,6 @@ def test_exclude_fields_type_and_values():
     assert str(e.value) == "'exclude_fields' must be a sequence of strings"
 
 
-@requires_py3
 def test_stack_info(logger):
     stream = StringIO()
     handler = logging.StreamHandler(stream)
@@ -327,7 +322,6 @@ def test_stack_info(logger):
     assert "test_stack_info" in error_stack_trace and __file__ in error_stack_trace
 
 
-@requires_py3
 @pytest.mark.parametrize("exclude_fields", [["error"], ["error.stack_trace"]])
 def test_stack_info_excluded(logger, exclude_fields):
     stream = StringIO()

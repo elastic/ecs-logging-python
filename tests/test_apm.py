@@ -24,7 +24,7 @@ import ecs_logging
 import logging
 import structlog
 import pytest
-from .compat import StringIO
+from io import StringIO
 
 
 def test_elasticapm_structlog_log_correlation_ecs_fields(spec_validator, apm):
