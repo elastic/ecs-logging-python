@@ -111,6 +111,15 @@
                 "The field helps to filter for different log streams from the same pod, for example and is required for log anomaly detection."
             ]
         },
+        "service.environment": {
+            "type": "string",
+            "required": false,
+            "url": "https://www.elastic.co/guide/en/ecs/current/ecs-service.html#field-service-environment",
+            "comment": [
+                "Configurable by users.",
+                "When an APM agent is active, it should auto-configure it if not already set."
+            ]
+        },
         "process.thread.name": {
             "type": "string",
             "required": false,
