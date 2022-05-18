@@ -1,37 +1,42 @@
 # Changelog
 
+## 2.0.0 (2022-05-18)
+
+- Remove python 2 support ([#78](https://github.com/elastic/ecs-logging-python/pull/78))
+- Add global `extra` context fields to `StdLibFormatter` ([#65](https://github.com/elastic/ecs-logging-python/pull/65))
+
 ## 1.1.0 (2021-10-18)
 
-* Remove python 3.5 support ([#69](https://github.com/elastic/ecs-logging-python/pull/69))
-* Fix an issue where APM fields would override user-provided fields even when
+- Remove python 3.5 support ([#69](https://github.com/elastic/ecs-logging-python/pull/69))
+- Fix an issue where APM fields would override user-provided fields even when
   APM wasn't installed ([#67](https://github.com/elastic/ecs-logging-python/pull/67))
-* Removed `event.dataset` field handling to match
+- Removed `event.dataset` field handling to match
   [`elastic-apm` v6.6.0](https://github.com/elastic/apm-agent-python/releases/tag/v6.6.0)
   ([#69](https://github.com/elastic/ecs-logging-python/pull/69))
 
 ## 1.0.2 (2021-09-22)
 
-* Fix an signature mismatch between `StdLibFormatter` and `logging.Formatter`,
+- Fix an signature mismatch between `StdLibFormatter` and `logging.Formatter`,
   which could cause issues in Django and Gunicorn
   ([#54](https://github.com/elastic/ecs-logging-python/pull/54))
 
 ## 1.0.1 (2021-07-06)
 
-* Fixed an issue in `StructlogFormatter` caused by a conflict with `event`
+- Fixed an issue in `StructlogFormatter` caused by a conflict with `event`
   (used for the log `message`) and `event.dataset` (a field provided by the
   `elasticapm` integration) ([#46](https://github.com/elastic/ecs-logging-python/pull/46))
-* Add default/fallback handling for json.dumps ([#47](https://github.com/elastic/ecs-logging-python/pull/47))
-* Fixed an issue in `StdLibFormatter` when `exc_info=False` ([#42](https://github.com/elastic/ecs-logging-python/pull/42))
+- Add default/fallback handling for json.dumps ([#47](https://github.com/elastic/ecs-logging-python/pull/47))
+- Fixed an issue in `StdLibFormatter` when `exc_info=False` ([#42](https://github.com/elastic/ecs-logging-python/pull/42))
 
 ## 1.0.0 (2021-02-08)
 
-* Remove "beta" designation
+- Remove "beta" designation
 
 ## 0.6.0 (2021-01-21)
 
-* Add validation against the ecs-logging [spec](https://github.com/elastic/ecs-logging/blob/main/spec/spec.json) ([#31](https://github.com/elastic/ecs-logging-python/pull/31))
-* Add support for `service.name` from APM log correlation ([#32](https://github.com/elastic/ecs-logging-python/pull/32))
-* Correctly order `@timestamp`, `log.level`, and `message` fields ([#28](https://github.com/elastic/ecs-logging-python/pull/28))
+- Add validation against the ecs-logging [spec](https://github.com/elastic/ecs-logging/blob/main/spec/spec.json) ([#31](https://github.com/elastic/ecs-logging-python/pull/31))
+- Add support for `service.name` from APM log correlation ([#32](https://github.com/elastic/ecs-logging-python/pull/32))
+- Correctly order `@timestamp`, `log.level`, and `message` fields ([#28](https://github.com/elastic/ecs-logging-python/pull/28))
 
 ## 0.5.0 (2020-08-27)
 

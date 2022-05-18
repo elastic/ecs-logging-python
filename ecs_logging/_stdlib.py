@@ -112,7 +112,7 @@ class StdlibFormatter(logging.Formatter):
             # validate was introduced in py3.8 so we need to only provide it if the user provided it
             _kwargs["validate"] = validate
         super().__init__(  # type: ignore[call-arg]
-            fmt=fmt, datefmt=datefmt, style=style, **_kwargs
+            fmt=fmt, datefmt=datefmt, style=style, **_kwargs  # type: ignore[arg-type]
         )
 
         if stack_trace_limit is not None:
