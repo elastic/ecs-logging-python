@@ -112,6 +112,9 @@ formatter = StdlibFormatter(
 [[structlog]]
 === Structlog Example
 
+Note that the structlog processor should be the last processor in the list,
+as it handles the conversion to JSON as well as the ECS field enrichment.
+
 [source,python]
 ----
 import structlog
