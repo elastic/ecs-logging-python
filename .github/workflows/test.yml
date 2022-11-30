@@ -15,13 +15,13 @@ permissions:
   contents: read
 
 jobs:
+
   pre-commit:
     if: github.event_name != 'schedule'
+    name: Run pre-commit
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-python@v3
-    - run: pre-commit/action@v3.0.0
+    - uses: elastic/apm-pipeline-library/.github/actions/pre-commit@current
 
   lint:
     if: github.event_name != 'schedule'
@@ -33,7 +33,6 @@ jobs:
     - run: .ci/scripts/lint.sh
 
   test:
-    if: github.event_name == 'schedule'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     strategy:
