@@ -32,7 +32,7 @@ jobs:
     - uses: actions/setup-python@v3
     - run: .ci/scripts/lint.sh
 
-	test:
+  test:
     if: github.event_name == 'schedule'
     runs-on: ubuntu-latest
     timeout-minutes: 10
