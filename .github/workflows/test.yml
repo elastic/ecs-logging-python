@@ -43,7 +43,7 @@ jobs:
       fail-fast: false
     steps:
     - uses: actions/checkout@v3
-    - uses: actions/setup-python@v3
+    - uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python }}
     - run: .ci/scripts/test.sh ${{ matrix.python }}
