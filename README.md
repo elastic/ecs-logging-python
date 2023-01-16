@@ -1,6 +1,6 @@
 # ecs-logging-python
 
-[![Build Status](https://apm-ci.elastic.co/job/apm-agent-python/job/ecs-logging-python-mbp/job/main/badge/icon)](https://apm-ci.elastic.co/blue/organizations/jenkins/apm-agent-python%2Fecs-logging-python-mbp/branches)
+[![Build Status](https://github.com/elastic/ecs-logging-python/actions/workflows/test.yml/badge.svg)](https://github.com/elastic/ecs-logging-pythonactions/workflows/test.yml)
 [![PyPI](https://img.shields.io/pypi/v/ecs-logging)](https://pypi.org/project/ecs-logging)
 [![Versions Supported](https://img.shields.io/pypi/pyversions/ecs-logging)](https://pypi.org/project/ecs-logging)
 
