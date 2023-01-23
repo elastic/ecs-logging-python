@@ -20,8 +20,8 @@ repos:
             --no-warn-unused-ignores,
             --implicit-reexport,
           ]
-  - repo: https://github.com/ambv/black
-    rev: 21.6b0
+  - repo: https://github.com/psf/black
+    rev: 22.12.0
     hooks:
       - id: black
         language_version: python3
