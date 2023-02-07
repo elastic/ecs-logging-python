@@ -8,13 +8,13 @@ scms:
       user: '{{ requiredEnv "GIT_USER" }}'
       email: '{{ requiredEnv "GIT_EMAIL" }}'
       owner: elastic
-      repository: ecs-logging-go-logrus
+      repository: ecs-logging-python
       token: '{{ requiredEnv "GITHUB_TOKEN" }}'
       username: '{{ requiredEnv "GIT_USER" }}'
       branch: main
 
 actions:
-  ecs-logging-go-logrus:
+  ecs-logging-python:
     kind: github/pullrequest
     scmid: githubConfig
     sourceid: sha
