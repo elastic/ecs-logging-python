@@ -5,6 +5,7 @@ on:
   workflow_run:
     workflows:
       - test
+      - update-specs
     types: [completed]
 
 jobs:
