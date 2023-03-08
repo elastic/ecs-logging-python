@@ -187,7 +187,7 @@ class StdlibFormatter(logging.Formatter):
         extractors = {
             "@timestamp": self._record_timestamp,
             "ecs.version": lambda _: ECS_VERSION,
-            "log.level": lambda r: (r.levelname.lower() if r.levelname else None),
+            "log.level": lambda r: (r.levelname.upper() if r.levelname else None),
             "log.origin.function": self._record_attribute("funcName"),
             "log.origin.file.line": self._record_attribute("lineno"),
             "log.origin.file.name": self._record_attribute("filename"),
