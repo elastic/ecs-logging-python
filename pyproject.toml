@@ -1,5 +1,5 @@
 [build-system]
-requires = ["flit_core >=2,<3"]
+requires = ["flit_core >=2,<4"]
 build-backend = "flit_core.buildapi"
 
 [tool.flit.metadata]
@@ -12,7 +12,6 @@ home-page = "https://github.com/elastic/ecs-logging-python"
 classifiers = [
   "Development Status :: 5 - Production/Stable",
   "Intended Audience :: Developers",
-  "Programming Language :: Python :: 2",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.6",
   "Programming Language :: Python :: 3.7",
