@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0.2 (2023-05-17)
+
+- Allow flit-core 3+ ([#94](https://github.com/elastic/ecs-logging-python/pull/94))
+- Remove python2 leftovers ([#94](https://github.com/elastic/ecs-logging-python/pull/94))
+
 ## 2.0.0 (2022-05-18)
 
 - Remove python 2 support ([#78](https://github.com/elastic/ecs-logging-python/pull/78))
