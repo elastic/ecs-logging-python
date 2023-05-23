@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.0 (unreleased)
+
+- Add support for `service.environment` from APM log correlation ([#96](https://github.com/elastic/ecs-logging-python/pull/96))
+
 ## 2.0.2 (2023-05-17)
 
 - Allow flit-core 3+ ([#94](https://github.com/elastic/ecs-logging-python/pull/94))
