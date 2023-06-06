@@ -19,19 +19,20 @@ import logging
 import sys
 import time
 from traceback import format_tb
+
 from ._meta import ECS_VERSION
 from ._utils import (
-    merge_dicts,
-    de_dot,
-    json_dumps,
     TYPE_CHECKING,
     collections_abc,
-    lru_cache,
+    de_dot,
     flatten_dict,
+    json_dumps,
+    lru_cache,
+    merge_dicts,
 )
 
 if TYPE_CHECKING:
-    from typing import Optional, Any, Callable, Dict, Sequence
+    from typing import Any, Callable, Dict, Optional, Sequence
 
     try:
         from typing import Literal, Union  # type: ignore
@@ -235,6 +236,9 @@ class StdlibFormatter(logging.Formatter):
         )
         extras.setdefault("trace.id", extras.pop("elasticapm_trace_id", None))
         extras.setdefault("service.name", extras.pop("elasticapm_service_name", None))
+        extras.setdefault(
+            "service.environment", extras.pop("elasticapm_service_environment", None)
+        )
 
         # Merge in any keys that were set within 'extra={...}'
         for field, value in extras.items():

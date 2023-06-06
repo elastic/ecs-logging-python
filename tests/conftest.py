@@ -15,14 +15,14 @@
 # specific language governing permissions and limitations
 # under the License.
 
+import collections
 import datetime
 import json
-import os
-import collections
-import sys
 import logging
-import elasticapm
+import os
+import sys
 
+import elasticapm
 import pytest
 
 
@@ -85,7 +85,9 @@ def spec_validator():
 @pytest.fixture
 def apm():
     record_factory = logging.getLogRecordFactory()
-    apm = elasticapm.Client({"SERVICE_NAME": "apm-service", "DISABLE_SEND": True})
+    apm = elasticapm.Client(
+        {"SERVICE_NAME": "apm-service", "ENVIRONMENT": "dev", "DISABLE_SEND": True}
+    )
     yield apm
     apm.close()
     logging.setLogRecordFactory(record_factory)

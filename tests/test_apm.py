@@ -16,15 +16,15 @@
 # under the License.
 
 import json
-import sys
+import logging
+from io import StringIO
+
 import elasticapm
+import structlog
 from elasticapm.handlers.logging import LoggingFilter
 from elasticapm.handlers.structlog import structlog_processor
+
 import ecs_logging
-import logging
-import structlog
-import pytest
-from io import StringIO
 
 
 def test_elasticapm_structlog_log_correlation_ecs_fields(spec_validator, apm):
@@ -55,7 +55,7 @@ def test_elasticapm_structlog_log_correlation_ecs_fields(spec_validator, apm):
         "span": {"id": span_id},
         "trace": {"id": trace_id},
         "transaction": {"id": transaction_id},
-        "service": {"name": "apm-service"},
+        "service": {"name": "apm-service", "environment": "dev"},
     }
 
 
@@ -98,7 +98,7 @@ def test_elastic_apm_stdlib_no_filter_log_correlation_ecs_fields(apm):
         "span": {"id": span_id},
         "trace": {"id": trace_id},
         "transaction": {"id": transaction_id},
-        "service": {"name": "apm-service"},
+        "service": {"name": "apm-service", "environment": "dev"},
     }
 
 
@@ -142,7 +142,7 @@ def test_elastic_apm_stdlib_with_filter_log_correlation_ecs_fields(apm):
         "span": {"id": span_id},
         "trace": {"id": trace_id},
         "transaction": {"id": transaction_id},
-        "service": {"name": "apm-service"},
+        "service": {"name": "apm-service", "environment": "dev"},
     }
 
 
@@ -187,5 +187,5 @@ def test_elastic_apm_stdlib_exclude_fields(apm):
         },
         "message": "test message",
         "trace": {"id": trace_id},
-        "service": {"name": "apm-service"},
+        "service": {"name": "apm-service", "environment": "dev"},
     }
