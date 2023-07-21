@@ -92,10 +92,7 @@ def test_can_be_set_as_processor(time, spec_validator):
     )
 
 
-@mock.patch("time.time")
-def test_exception_log_is_ecs_compliant_when_used_with_format_exc_info(time):
-    time.return_value = 1584720997.187709
-
+def test_exception_log_is_ecs_compliant_when_used_with_format_exc_info():
     formatter = ecs_logging.StructlogFormatter()
     formatted_event_dict = json.loads(formatter(None, "debug", event_dict_with_exception()))
 
