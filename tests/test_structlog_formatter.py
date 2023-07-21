@@ -15,6 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
+import json
 import ecs_logging
 import structlog
 from unittest import mock
@@ -34,6 +35,15 @@ def make_event_dict():
         "log.logger": "logger-name",
         "foo": "bar",
         "baz": NotSerializable(),
+    }
+
+
+def event_dict_with_exception():
+    return {
+        "event": "test message",
+        "log.logger": "logger-name",
+        "foo": "bar",
+        "exception": "<stack trace here>",
     }
 
 
@@ -80,3 +90,16 @@ def test_can_be_set_as_processor(time, spec_validator):
         '"message":"test message","custom":"key","dot":{"ted":1},'
         '"ecs":{"version":"1.6.0"}}\n'
     )
+
+
+@mock.patch("time.time")
+def test_exception_log_is_ecs_compliant_when_used_with_format_exc_info(time):
+    time.return_value = 1584720997.187709
+
+    formatter = ecs_logging.StructlogFormatter()
+    formatted_event_dict = json.loads(formatter(None, "debug", event_dict_with_exception()))
+
+    assert "exception" not in formatted_event_dict, "The key 'exception' at the root of a log is not ECS-compliant"
+    assert "error" in formatted_event_dict
+    assert "stack_trace" in formatted_event_dict["error"]
+    assert "<stack trace here>" in formatted_event_dict["error"]["stack_trace"]
