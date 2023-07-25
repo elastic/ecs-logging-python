@@ -47,5 +47,13 @@ class StructlogFormatter:
                 )[:-3]
                 + "Z"
             )
+
+        if "exception" in event_dict:
+            stack_trace = event_dict.pop("exception")
+            if "error" in event_dict:
+                event_dict["error"]["stack_trace"] = stack_trace
+            else:
+                event_dict["error"] = {"stack_trace": stack_trace}
+
         event_dict.setdefault("ecs", {}).setdefault("version", ECS_VERSION)
         return event_dict

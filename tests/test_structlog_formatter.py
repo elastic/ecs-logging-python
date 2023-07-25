@@ -15,12 +15,14 @@
 # specific language governing permissions and limitations
 # under the License.
 
-import ecs_logging
-import structlog
-from unittest import mock
+import json
 from io import StringIO
+from unittest import mock
 
 import pytest
+import structlog
+
+import ecs_logging
 
 
 class NotSerializable:
@@ -28,7 +30,8 @@ class NotSerializable:
         return "<NotSerializable>"
 
 
-def make_event_dict():
+@pytest.fixture
+def event_dict():
     return {
         "event": "test message",
         "log.logger": "logger-name",
@@ -37,20 +40,29 @@ def make_event_dict():
     }
 
 
-def test_conflicting_event_dict():
+@pytest.fixture
+def event_dict_with_exception():
+    return {
+        "event": "test message",
+        "log.logger": "logger-name",
+        "foo": "bar",
+        "exception": "<stack trace here>",
+    }
+
+
+def test_conflicting_event_dict(event_dict):
     formatter = ecs_logging.StructlogFormatter()
-    event_dict = make_event_dict()
     event_dict["foo.bar"] = "baz"
     with pytest.raises(TypeError):
         formatter(None, "debug", event_dict)
 
 
 @mock.patch("time.time")
-def test_event_dict_formatted(time, spec_validator):
+def test_event_dict_formatted(time, spec_validator, event_dict):
     time.return_value = 1584720997.187709
 
     formatter = ecs_logging.StructlogFormatter()
-    assert spec_validator(formatter(None, "debug", make_event_dict())) == (
+    assert spec_validator(formatter(None, "debug", event_dict)) == (
         '{"@timestamp":"2020-03-20T16:16:37.187Z","log.level":"debug",'
         '"message":"test message",'
         '"baz":"<NotSerializable>",'
@@ -80,3 +92,19 @@ def test_can_be_set_as_processor(time, spec_validator):
         '"message":"test message","custom":"key","dot":{"ted":1},'
         '"ecs":{"version":"1.6.0"}}\n'
     )
+
+
+def test_exception_log_is_ecs_compliant_when_used_with_format_exc_info(
+    event_dict_with_exception,
+):
+    formatter = ecs_logging.StructlogFormatter()
+    formatted_event_dict = json.loads(
+        formatter(None, "debug", event_dict_with_exception)
+    )
+
+    assert (
+        "exception" not in formatted_event_dict
+    ), "The key 'exception' at the root of a log is not ECS-compliant"
+    assert "error" in formatted_event_dict
+    assert "stack_trace" in formatted_event_dict["error"]
+    assert "<stack trace here>" in formatted_event_dict["error"]["stack_trace"]
