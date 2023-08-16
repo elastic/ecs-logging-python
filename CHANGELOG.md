@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.1.0 (unreleased)
+## 2.1.0 (2023-08-16)
 
 - Add support for `service.environment` from APM log correlation ([#96](https://github.com/elastic/ecs-logging-python/pull/96))
 - Fix stack trace handling in StructLog for ECS compliance ([#97](https://github.com/elastic/ecs-logging-python/pull/97))
