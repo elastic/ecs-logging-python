@@ -20,7 +20,6 @@ import datetime
 import json
 import logging
 import os
-import sys
 
 import elasticapm
 import pytest
@@ -75,7 +74,7 @@ def spec_validator():
                             )
                         )
             if v.get("index") and list(data.keys())[v.get("index")] != k:
-                raise ValidationError(f"Key {k} is not at index {index}")
+                raise ValidationError(f"Key {k} is not at index {v.get('index')}")
 
         return data_json
 
