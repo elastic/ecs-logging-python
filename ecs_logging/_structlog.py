@@ -18,17 +18,15 @@
 import time
 import datetime
 from ._meta import ECS_VERSION
-from ._utils import json_dumps, normalize_dict, TYPE_CHECKING
+from ._utils import json_dumps, normalize_dict
 
-if TYPE_CHECKING:
-    from typing import Any, Dict
+from typing import Any, Dict
 
 
 class StructlogFormatter:
     """ECS formatter for the ``structlog`` module"""
 
-    def __call__(self, _, name, event_dict):
-        # type: (Any, str, Dict[str, Any]) -> str
+    def __call__(self, _: Any, name: str, event_dict: Dict[str, Any]) -> str:
 
         # Handle event -> message now so that stuff like `event.dataset` doesn't
         # cause problems down the line
@@ -38,8 +36,7 @@ class StructlogFormatter:
         event_dict = self.format_to_ecs(event_dict)
         return json_dumps(event_dict)
 
-    def format_to_ecs(self, event_dict):
-        # type: (Dict[str, Any]) -> Dict[str, Any]
+    def format_to_ecs(self, event_dict: Dict[str, Any]) -> Dict[str, Any]:
         if "@timestamp" not in event_dict:
             event_dict["@timestamp"] = (
                 datetime.datetime.utcfromtimestamp(time.time()).strftime(

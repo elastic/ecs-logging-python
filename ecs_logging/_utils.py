@@ -17,17 +17,9 @@
 
 import json
 import functools
+import typing
 
-try:
-    import typing
-
-    TYPE_CHECKING = typing.TYPE_CHECKING
-except ImportError:
-    typing = None  # type: ignore
-    TYPE_CHECKING = False
-
-if TYPE_CHECKING:
-    from typing import Any, Dict
+from typing import Any, Dict
 
 try:
     import collections.abc as collections_abc
@@ -46,14 +38,12 @@ __all__ = [
     "de_dot",
     "merge_dicts",
     "json_dumps",
-    "TYPE_CHECKING",
     "typing",
     "lru_cache",
 ]
 
 
-def flatten_dict(value):
-    # type: (typing.Mapping[str, Any]) -> Dict[str, Any]
+def flatten_dict(value: typing.Mapping[str, Any]) -> Dict[str, Any]:
     """Adds dots to all nested fields in dictionaries.
     Raises an error if there are entries which are represented
     with different forms of nesting. (ie {"a": {"b": 1}, "a.b": 2})
@@ -77,8 +67,7 @@ def flatten_dict(value):
     return top_level
 
 
-def normalize_dict(value):
-    # type: (Dict[str, Any]) -> Dict[str, Any]
+def normalize_dict(value: Dict[str, Any]) -> Dict[str, Any]:
     """Expands all dotted names to nested dictionaries"""
     if not isinstance(value, dict):
         return value
@@ -94,8 +83,7 @@ def normalize_dict(value):
     return value
 
 
-def de_dot(dot_string, msg):
-    # type: (str, Any) -> Dict[str, Any]
+def de_dot(dot_string: str, msg: Any) -> Dict[str, Any]:
     """Turn value and dotted string key into a nested dictionary"""
     arr = dot_string.split(".")
     ret = {arr[-1]: msg}
@@ -104,8 +92,7 @@ def de_dot(dot_string, msg):
     return ret
 
 
-def merge_dicts(from_, into):
-    # type: (Dict[Any, Any], Dict[Any, Any]) -> Dict[Any, Any]
+def merge_dicts(from_: Dict[Any, Any], into: Dict[Any, Any]) -> Dict[Any, Any]:
     """Merge deeply nested dictionary structures.
     When called has side-effects within 'destination'.
     """
@@ -125,9 +112,7 @@ def merge_dicts(from_, into):
     return into
 
 
-def json_dumps(value):
-    # type: (Dict[str, Any]) -> str
-
+def json_dumps(value: Dict[str, Any]) -> str:
     # Ensure that the first three fields are '@timestamp',
     # 'log.level', and 'message' per ECS spec
     ordered_fields = []
@@ -175,8 +160,7 @@ def json_dumps(value):
         return json_dumps(value)
 
 
-def _json_dumps_fallback(value):
-    # type: (Any) -> Any
+def _json_dumps_fallback(value: Any) -> Any:
     """
     Fallback handler for json.dumps to handle objects json doesn't know how to
     serialize.
