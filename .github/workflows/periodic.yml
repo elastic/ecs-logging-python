@@ -10,6 +10,16 @@ permissions:
 
 jobs:
 
-  # Invokes the actual matrix workflow.
   test:
-    uses: ./.github/workflows/matrix.yml
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        python: [ '3.7', '3.8', '3.9', '3.10' ]
+      fail-fast: false
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python }}
+    - run: .ci/scripts/test.sh ${{ matrix.python }}
