@@ -1,9 +1,6 @@
 name: test
 
 on:
-  # Run daily at midnight
-  schedule:
-    - cron: "0 0 * * *"
   push:
     branches: [ "main" ]
     paths-ignore: [ '*.md', '*.asciidoc' ]
@@ -17,14 +14,12 @@ permissions:
 jobs:
 
   pre-commit:
-    if: github.event_name != 'schedule'
     name: Run pre-commit
     runs-on: ubuntu-latest
     steps:
     - uses: elastic/apm-pipeline-library/.github/actions/pre-commit@current
 
   lint:
-    if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -34,16 +29,6 @@ jobs:
         python-version: '3.7'
     - run: .ci/scripts/lint.sh
 
+  # Invokes the actual matrix workflow with the provided files.
   test:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    strategy:
-      matrix:
-        python: [ '3.7', '3.8', '3.9', '3.10' ]
-      fail-fast: false
-    steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python }}
-    - run: .ci/scripts/test.sh ${{ matrix.python }}
+    uses: ./.github/workflows/matrix.yml

@@ -4,6 +4,8 @@ name: OpenTelemetry Export Trace
 on:
   workflow_run:
     workflows:
+      - matrix
+      - periodic
       - test
       - update-specs
     types: [completed]

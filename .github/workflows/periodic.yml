@@ -1,0 +1,15 @@
+name: periodic
+
+on:
+  # Run daily at midnight
+  schedule:
+    - cron: "0 0 * * *"
+
+permissions:
+  contents: read
+
+jobs:
+
+  # Invokes the actual matrix workflow with the provided files.
+  test:
+    uses: ./.github/workflows/matrix.yml
