@@ -11,6 +11,13 @@ on:
 permissions:
   contents: read
 
+
+## Concurrency is only allowed in the main branch.
+## So old builds, running for old commits within the same Pull Request, are cancelled
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
 jobs:
 
   pre-commit:
@@ -29,6 +36,6 @@ jobs:
         python-version: '3.7'
     - run: .ci/scripts/lint.sh
 
-  # Invokes the actual matrix workflow with the provided files.
+  # Invokes the actual matrix workflow
   test:
     uses: ./.github/workflows/matrix.yml

@@ -10,6 +10,6 @@ permissions:
 
 jobs:
 
-  # Invokes the actual matrix workflow with the provided files.
+  # Invokes the actual matrix workflow.
   test:
     uses: ./.github/workflows/matrix.yml
