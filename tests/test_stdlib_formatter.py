@@ -22,7 +22,6 @@ import pytest
 import json
 import time
 import random
-import sys
 import ecs_logging
 from io import StringIO
 
