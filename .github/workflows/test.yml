@@ -1,9 +1,6 @@
 name: test
 
 on:
-  # Run daily at midnight
-  schedule:
-    - cron: "0 0 * * *"
   push:
     branches: [ "main" ]
     paths-ignore: [ '*.md', '*.asciidoc' ]
@@ -14,17 +11,22 @@ on:
 permissions:
   contents: read
 
+
+## Concurrency is only allowed in the main branch.
+## So old builds, running for old commits within the same Pull Request, are cancelled
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
 jobs:
 
   pre-commit:
-    if: github.event_name != 'schedule'
     name: Run pre-commit
     runs-on: ubuntu-latest
     steps:
     - uses: elastic/apm-pipeline-library/.github/actions/pre-commit@current
 
   lint:
-    if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -42,7 +44,7 @@ jobs:
         python: [ '3.7', '3.8', '3.9', '3.10' ]
       fail-fast: false
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python }}
