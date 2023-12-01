@@ -1,13 +1,6 @@
 ---
 version: 2
 updates:
-  # Enable version updates for pytest_otel
-  - package-ecosystem: "pip"
-    # Check for updates once a month
-    schedule:
-      interval: "weekly"
-      day: "sunday"
-      time: "22:00"
 
   # Maintain dependencies for GitHub Actions (/.github/workflows)
   - package-ecosystem: "github-actions"
