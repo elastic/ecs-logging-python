@@ -42,9 +42,9 @@ class StructlogFormatter:
         # type: (Dict[str, Any]) -> Dict[str, Any]
         if "@timestamp" not in event_dict:
             event_dict["@timestamp"] = (
-                datetime.datetime.utcfromtimestamp(time.time()).strftime(
-                    "%Y-%m-%dT%H:%M:%S.%f"
-                )[:-3]
+                datetime.datetime.fromtimestamp(
+                    time.time(), tz=datetime.timezone.utc
+                ).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]
                 + "Z"
             )
 
