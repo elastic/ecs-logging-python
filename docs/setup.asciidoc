@@ -191,7 +191,7 @@ logger.debug("Example message!")
 
 `ecs-logging-python` supports automatically collecting  {ecs-ref}/ecs-tracing.html[ECS tracing fields]
 from the https://github.com/elastic/apm-agent-python[Elastic APM Python agent] in order to
-{apm-py-ref}/log-correlation.html[correlate logs to spans, transactions and traces] in Elastic APM.
+{apm-py-ref}/logs.html[correlate logs to spans, transactions and traces] in Elastic APM.
 
 You can also quickly turn on ECS-formatted logs in your python app by setting
 {apm-py-ref}/configuration.html#config-log_ecs_reformatting[`LOG_ECS_REFORMATTING=override`]
