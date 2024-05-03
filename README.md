@@ -21,7 +21,7 @@ See the [ECS Logging Python reference](https://www.elastic.co/guide/en/ecs-loggi
 
 ## Elastic APM Log Correlation
 
-`ecs-logging-python` supports automatically collecting [ECS tracing fields](https://www.elastic.co/guide/en/ecs/master/ecs-tracing.html)
+`ecs-logging-python` supports automatically collecting [ECS tracing fields](https://www.elastic.co/guide/en/ecs/current/ecs-tracing.html)
 from the [Elastic APM Python agent](https://github.com/elastic/apm-agent-python) in order to
 [correlate logs to spans, transactions and traces](https://www.elastic.co/guide/en/apm/agent/python/current/log-correlation.html) in Elastic APM.
 
