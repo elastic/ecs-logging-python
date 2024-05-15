@@ -36,7 +36,7 @@ class StructlogFormatter:
         event_dict = normalize_dict(event_dict)
         event_dict.setdefault("log", {}).setdefault("level", name.lower())
         event_dict = self.format_to_ecs(event_dict)
-        return json_dumps(event_dict)
+        return self._json_dumps(event_dict)
 
     def format_to_ecs(self, event_dict):
         # type: (Dict[str, Any]) -> Dict[str, Any]
@@ -57,3 +57,7 @@ class StructlogFormatter:
 
         event_dict.setdefault("ecs", {}).setdefault("version", ECS_VERSION)
         return event_dict
+
+    def _json_dumps(self, value):
+        # type: (Dict[str, Any]) -> str
+        return json_dumps(value=value)
