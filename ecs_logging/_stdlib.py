@@ -209,7 +209,12 @@ class StdlibFormatter(logging.Formatter):
                 continue
             value = extractors[field](record)
             if value is not None:
-                merge_dicts(de_dot(field, value), result)
+                # special case ecs.version that should not be de-dotted
+                if field == "ecs.version":
+                    field_dict = {field: value}
+                else:
+                    field_dict = de_dot(field, value)
+                merge_dicts(field_dict, result)
 
         available = record.__dict__
 

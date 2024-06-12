@@ -55,7 +55,7 @@ class StructlogFormatter:
             else:
                 event_dict["error"] = {"stack_trace": stack_trace}
 
-        event_dict.setdefault("ecs", {}).setdefault("version", ECS_VERSION)
+        event_dict.setdefault("ecs.version", ECS_VERSION)
         return event_dict
 
     def _json_dumps(self, value):

@@ -51,7 +51,7 @@ def test_record_formatted(spec_validator):
     formatter = ecs_logging.StdlibFormatter(exclude_fields=["process"])
 
     assert spec_validator(formatter.format(make_record())) == (
-        '{"@timestamp":"2020-03-20T14:12:46.123Z","log.level":"debug","message":"1: hello","ecs":{"version":"1.6.0"},'
+        '{"@timestamp":"2020-03-20T14:12:46.123Z","log.level":"debug","message":"1: hello","ecs.version":"1.6.0",'
         '"log":{"logger":"logger-name","origin":{"file":{"line":10,"name":"file.py"},"function":"test_function"},'
         '"original":"1: hello"}}'
     )
@@ -63,7 +63,7 @@ def test_extra_global_is_merged(spec_validator):
     )
 
     assert spec_validator(formatter.format(make_record())) == (
-        '{"@timestamp":"2020-03-20T14:12:46.123Z","log.level":"debug","message":"1: hello","ecs":{"version":"1.6.0"},'
+        '{"@timestamp":"2020-03-20T14:12:46.123Z","log.level":"debug","message":"1: hello","ecs.version":"1.6.0",'
         '"environment":"dev",'
         '"log":{"logger":"logger-name","origin":{"file":{"line":10,"name":"file.py"},"function":"test_function"},'
         '"original":"1: hello"}}'
@@ -80,7 +80,7 @@ def test_can_be_overridden(spec_validator):
     formatter = CustomFormatter(exclude_fields=["process"])
     assert spec_validator(formatter.format(make_record())) == (
         '{"@timestamp":"2020-03-20T14:12:46.123Z","log.level":"debug","message":"1: hello",'
-        '"custom":"field","ecs":{"version":"1.6.0"},"log":{"logger":"logger-name","origin":'
+        '"custom":"field","ecs.version":"1.6.0","log":{"logger":"logger-name","origin":'
         '{"file":{"line":10,"name":"file.py"},"function":"test_function"},"original":"1: hello"}}'
     )
 
@@ -94,7 +94,7 @@ def test_can_be_set_on_handler():
 
     assert stream.getvalue() == (
         '{"@timestamp":"2020-03-20T14:12:46.123Z","log.level":"debug","message":"1: hello",'
-        '"ecs":{"version":"1.6.0"},"log":{"logger":"logger-name","origin":{"file":{"line":10,'
+        '"ecs.version":"1.6.0","log":{"logger":"logger-name","origin":{"file":{"line":10,'
         '"name":"file.py"},"function":"test_function"},"original":"1: hello"}}\n'
     )
 
@@ -127,7 +127,7 @@ def test_extra_is_merged(time, logger):
     assert isinstance(ecs["log"]["origin"]["file"].pop("line"), int)
     assert ecs == {
         "@timestamp": "2020-03-20T16:16:37.187Z",
-        "ecs": {"version": "1.6.0"},
+        "ecs.version": "1.6.0",
         "log.level": "info",
         "log": {
             "logger": logger.name,
@@ -254,8 +254,6 @@ def test_stack_trace_limit_types_and_values():
     "exclude_fields",
     [
         "process",
-        "ecs",
-        "ecs.version",
         "log",
         "log.level",
         "message",
@@ -277,6 +275,19 @@ def test_exclude_fields(exclude_fields):
         except KeyError:
             continue
         assert field_path[-1] not in obj
+
+
+@pytest.mark.parametrize(
+    "exclude_fields",
+    [
+        "ecs.version",
+    ],
+)
+def test_exclude_fields_not_dedotted(exclude_fields):
+    formatter = ecs_logging.StdlibFormatter(exclude_fields=[exclude_fields])
+    ecs = formatter.format_to_ecs(make_record())
+    for entry in exclude_fields:
+        assert entry not in ecs
 
 
 def test_exclude_fields_empty_json_object():
@@ -350,7 +361,7 @@ def test_apm_data_conflicts(spec_validator):
     formatter = ecs_logging.StdlibFormatter(exclude_fields=["process"])
 
     assert spec_validator(formatter.format(record)) == (
-        '{"@timestamp":"2020-03-20T14:12:46.123Z","log.level":"debug","message":"1: hello","ecs":{"version":"1.6.0"},'
+        '{"@timestamp":"2020-03-20T14:12:46.123Z","log.level":"debug","message":"1: hello","ecs.version":"1.6.0",'
         '"log":{"logger":"logger-name","origin":{"file":{"line":10,"name":"file.py"},"function":"test_function"},'
         '"original":"1: hello"},"service":{"environment":"dev","name":"myapp","version":"1.0.0"}}'
     )
