@@ -66,7 +66,7 @@ def test_event_dict_formatted(time, spec_validator, event_dict):
         '{"@timestamp":"2020-03-20T16:16:37.187Z","log.level":"debug",'
         '"message":"test message",'
         '"baz":"<NotSerializable>",'
-        '"ecs":{"version":"1.6.0"},'
+        '"ecs.version":"1.6.0",'
         '"foo":"bar",'
         '"log":{"logger":"logger-name"}}'
     )
@@ -90,7 +90,7 @@ def test_can_be_set_as_processor(time, spec_validator):
     assert spec_validator(stream.getvalue()) == (
         '{"@timestamp":"2020-03-20T16:16:37.187Z","log.level":"debug",'
         '"message":"test message","custom":"key","dot":{"ted":1},'
-        '"ecs":{"version":"1.6.0"}}\n'
+        '"ecs.version":"1.6.0"}\n'
     )
 
 
