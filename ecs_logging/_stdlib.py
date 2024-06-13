@@ -15,29 +15,27 @@
 # specific language governing permissions and limitations
 # under the License.
 
+import collections.abc
 import logging
 import sys
 import time
+from functools import lru_cache
 from traceback import format_tb
 
 from ._meta import ECS_VERSION
 from ._utils import (
-    TYPE_CHECKING,
-    collections_abc,
     de_dot,
     flatten_dict,
     json_dumps,
-    lru_cache,
     merge_dicts,
 )
 
-if TYPE_CHECKING:
-    from typing import Any, Callable, Dict, Optional, Sequence
+from typing import Any, Callable, Dict, Optional, Sequence, Union
 
-    try:
-        from typing import Literal, Union  # type: ignore
-    except ImportError:
-        from typing_extensions import Literal, Union  # type: ignore
+try:
+    from typing import Literal  # type: ignore
+except ImportError:
+    from typing_extensions import Literal  # type: ignore
 
 
 # Load the attributes of a LogRecord so if some are
@@ -78,16 +76,15 @@ class StdlibFormatter(logging.Formatter):
     converter = time.gmtime
 
     def __init__(
-        self,  # type: Any
-        fmt=None,  # type: Optional[str]
-        datefmt=None,  # type: Optional[str]
-        style="%",  # type: Union[Literal["%"], Literal["{"], Literal["$"]]
-        validate=None,  # type: Optional[bool]
-        stack_trace_limit=None,  # type: Optional[int]
-        extra=None,  # type: Optional[Dict[str, Any]]
-        exclude_fields=(),  # type: Sequence[str]
-    ):
-        # type: (...) -> None
+        self,
+        fmt: Optional[str] = None,
+        datefmt: Optional[str] = None,
+        style: Union[Literal["%"], Literal["{"], Literal["$"]] = "%",
+        validate: Optional[bool] = None,
+        stack_trace_limit: Optional[int] = None,
+        extra: Optional[Dict[str, Any]] = None,
+        exclude_fields: Sequence[str] = (),
+    ) -> None:
         """Initialize the ECS formatter.
 
         :param int stack_trace_limit:
@@ -127,7 +124,7 @@ class StdlibFormatter(logging.Formatter):
                 )
 
         if (
-            not isinstance(exclude_fields, collections_abc.Sequence)
+            not isinstance(exclude_fields, collections.abc.Sequence)
             or isinstance(exclude_fields, str)
             or any(not isinstance(item, str) for item in exclude_fields)
         ):
@@ -137,8 +134,7 @@ class StdlibFormatter(logging.Formatter):
         self._exclude_fields = frozenset(exclude_fields)
         self._stack_trace_limit = stack_trace_limit
 
-    def _record_error_type(self, record):
-        # type: (logging.LogRecord) -> Optional[str]
+    def _record_error_type(self, record: logging.LogRecord) -> Optional[str]:
         exc_info = record.exc_info
         if not exc_info:
             # exc_info is either an iterable or bool. If it doesn't
@@ -151,8 +147,7 @@ class StdlibFormatter(logging.Formatter):
             return exc_info[0].__name__
         return None
 
-    def _record_error_message(self, record):
-        # type: (logging.LogRecord) -> Optional[str]
+    def _record_error_message(self, record: logging.LogRecord) -> Optional[str]:
         exc_info = record.exc_info
         if not exc_info:
             # exc_info is either an iterable or bool. If it doesn't
@@ -165,13 +160,11 @@ class StdlibFormatter(logging.Formatter):
             return str(exc_info[1])
         return None
 
-    def format(self, record):
-        # type: (logging.LogRecord) -> str
+    def format(self, record: logging.LogRecord) -> str:
         result = self.format_to_ecs(record)
         return json_dumps(result)
 
-    def format_to_ecs(self, record):
-        # type: (logging.LogRecord) -> Dict[str, Any]
+    def format_to_ecs(self, record: logging.LogRecord) -> Dict[str, Any]:
         """Function that can be overridden to add additional fields to
         (or remove fields from) the JSON before being dumped into a string.
 
@@ -185,7 +178,7 @@ class StdlibFormatter(logging.Formatter):
                   return result
         """
 
-        extractors = {
+        extractors: Dict[str, Callable[[logging.LogRecord], Any]] = {
             "@timestamp": self._record_timestamp,
             "ecs.version": lambda _: ECS_VERSION,
             "log.level": lambda r: (r.levelname.lower() if r.levelname else None),
@@ -201,9 +194,9 @@ class StdlibFormatter(logging.Formatter):
             "error.type": self._record_error_type,
             "error.message": self._record_error_message,
             "error.stack_trace": self._record_error_stack_trace,
-        }  # type: Dict[str, Callable[[logging.LogRecord],Any]]
+        }
 
-        result = {}  # type: Dict[str, Any]
+        result: Dict[str, Any] = {}
         for field in set(extractors.keys()).difference(self._exclude_fields):
             if self._is_field_excluded(field):
                 continue
@@ -262,8 +255,7 @@ class StdlibFormatter(logging.Formatter):
         return result
 
     @lru_cache()
-    def _is_field_excluded(self, field):
-        # type: (str) -> bool
+    def _is_field_excluded(self, field: str) -> bool:
         field_path = []
         for path in field.split("."):
             field_path.append(path)
@@ -271,19 +263,18 @@ class StdlibFormatter(logging.Formatter):
                 return True
         return False
 
-    def _record_timestamp(self, record):
-        # type: (logging.LogRecord) -> str
+    def _record_timestamp(self, record: logging.LogRecord) -> str:
         return "%s.%03dZ" % (
             self.formatTime(record, datefmt="%Y-%m-%dT%H:%M:%S"),
             record.msecs,
         )
 
-    def _record_attribute(self, attribute):
-        # type: (str) -> Callable[[logging.LogRecord], Optional[Any]]
+    def _record_attribute(
+        self, attribute: str
+    ) -> Callable[[logging.LogRecord], Optional[Any]]:
         return lambda r: getattr(r, attribute, None)
 
-    def _record_error_stack_trace(self, record):
-        # type: (logging.LogRecord) -> Optional[str]
+    def _record_error_stack_trace(self, record: logging.LogRecord) -> Optional[str]:
         # Using stack_info=True will add 'error.stack_trace' even
         # if the type is not 'error', exc_info=True only gathers
         # when there's an active exception.
