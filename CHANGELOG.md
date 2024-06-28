@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.2.0 (2024-06-28)
+
+- Rewrite type annotations ([#119](https://github.com/elastic/ecs-logging-python/pull/119))
+- Don't de-dot `ecs.version` ([#118](https://github.com/elastic/ecs-logging-python/pull/118))
+- Make it possible override the JSON serializer in `StructlogFormatter` ([#114](https://github.com/elastic/ecs-logging-python/pull/114))
+- Use `fromtimestamp` instead of deprecated `utcfromtimestamp` ([#105](https://github.com/elastic/ecs-logging-python/pull/105))
+- Remove unused imports and fix an undefined name ([#101](https://github.com/elastic/ecs-logging-python/pull/101))
+
 ## 2.1.0 (2023-08-16)
 
 - Add support for `service.environment` from APM log correlation ([#96](https://github.com/elastic/ecs-logging-python/pull/96))
