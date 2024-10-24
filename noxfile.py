@@ -58,6 +58,5 @@ def lint(session):
         "mypy",
         "--strict",
         "--show-error-codes",
-        "--no-warn-unused-ignores",
         "ecs_logging/",
     )
