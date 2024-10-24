@@ -111,11 +111,16 @@ class StdlibFormatter(logging.Formatter):
         # validate was introduced in py3.8 so we need to only provide it if the user provided it
         if sys.version_info >= (3, 8) and validate is not None:
             super().__init__(
-                fmt=fmt, datefmt=datefmt, style=style, validate=validate,
+                fmt=fmt,
+                datefmt=datefmt,
+                style=style,
+                validate=validate,
             )
         else:
             super().__init__(
-                fmt=fmt, datefmt=datefmt, style=style,
+                fmt=fmt,
+                datefmt=datefmt,
+                style=style,
             )
 
         if stack_trace_limit is not None:
