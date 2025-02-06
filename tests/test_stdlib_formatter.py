@@ -99,9 +99,11 @@ def test_can_be_set_on_handler():
     )
 
 
+@mock.patch("time.time_ns")
 @mock.patch("time.time")
-def test_extra_is_merged(time, logger):
+def test_extra_is_merged(time, time_ns, logger):
     time.return_value = 1584720997.187709
+    time_ns.return_value = time.return_value * 1_000_000_000
 
     stream = StringIO()
     handler = logging.StreamHandler(stream)
