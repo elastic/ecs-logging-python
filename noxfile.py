@@ -36,7 +36,7 @@ def tests_impl(session):
     )
 
 
-@nox.session(python=["3.6", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12"])
+@nox.session(python=["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"])
 def test(session):
     tests_impl(session)
 
