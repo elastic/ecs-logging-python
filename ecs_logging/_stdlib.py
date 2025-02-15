@@ -30,12 +30,7 @@ from ._utils import (
     merge_dicts,
 )
 
-from typing import Any, Callable, Dict, Optional, Sequence, Union
-
-try:
-    from typing import Literal  # type: ignore
-except ImportError:
-    from typing_extensions import Literal  # type: ignore
+from typing import Any, Callable, Dict, Optional, Sequence, Union, Literal
 
 
 # Load the attributes of a LogRecord so if some are
