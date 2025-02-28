@@ -2,6 +2,7 @@ project: 'ECS Logging Python'
 cross_links:
   - apm-agent-python
   - beats
+  - docs-content
   - ecs
   - ecs-logging
 toc:
