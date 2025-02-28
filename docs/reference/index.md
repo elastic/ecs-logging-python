@@ -9,7 +9,7 @@ mapped_pages:
 ECS loggers are formatter/encoder plugins for your favorite logging libraries. They make it easy to format your logs into ECS-compatible JSON.
 
 ::::{tip}
-Want to learn more about ECS, ECS logging, and other available language plugins? See the [ECS logging guide](ecs-logging://docs/reference/intro.md).
+Want to learn more about ECS, ECS logging, and other available language plugins? See the [ECS logging guide](ecs-logging://reference/intro.md).
 ::::
 
 

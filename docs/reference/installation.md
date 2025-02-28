@@ -176,9 +176,9 @@ logger.debug("Example message!")
 
 ## Elastic APM log correlation [correlation]
 
-`ecs-logging-python` supports automatically collecting  [ECS tracing fields](ecs://docs/reference/ecs-tracing.md) from the [Elastic APM Python agent](https://github.com/elastic/apm-agent-python) in order to [correlate logs to spans, transactions and traces](apm-agent-python://docs/reference/logs.md) in Elastic APM.
+`ecs-logging-python` supports automatically collecting  [ECS tracing fields](ecs://reference/ecs-tracing.md) from the [Elastic APM Python agent](https://github.com/elastic/apm-agent-python) in order to [correlate logs to spans, transactions and traces](apm-agent-python://reference/logs.md) in Elastic APM.
 
-You can also quickly turn on ECS-formatted logs in your python app by setting [`LOG_ECS_REFORMATTING=override`](apm-agent-python://docs/reference/configuration.md#config-log_ecs_reformatting) in the Elastic APM Python agent.
+You can also quickly turn on ECS-formatted logs in your python app by setting [`LOG_ECS_REFORMATTING=override`](apm-agent-python://reference/configuration.md#config-log_ecs_reformatting) in the Elastic APM Python agent.
 
 
 ## Install Filebeat [filebeat]
@@ -188,7 +188,7 @@ The best way to collect the logs once they are ECS-formatted is with [Filebeat](
 :::::::{tab-set}
 
 ::::::{tab-item} Log file
-1. Follow the [Filebeat quick start](beats://docs/reference/filebeat/filebeat-installation-configuration.md)
+1. Follow the [Filebeat quick start](beats://reference/filebeat/filebeat-installation-configuration.md)
 2. Add the following configuration to your `filebeat.yaml` file.
 
 For Filebeat 7.16+
@@ -214,7 +214,7 @@ processors: <5>
 2. Values from the decoded JSON object overwrite the fields that {{filebeat}} normally adds (type, source, offset, etc.) in case of conflicts.
 3. {{filebeat}} adds an "error.message" and "error.type: json" key in case of JSON unmarshalling errors.
 4. {{filebeat}} will recursively de-dot keys in the decoded JSON, and expand them into a hierarchical object structure.
-5. Processors enhance your data. See [processors](beats://docs/reference/filebeat/filtering-enhancing-data.md) to learn more.
+5. Processors enhance your data. See [processors](beats://reference/filebeat/filtering-enhancing-data.md) to learn more.
 
 
 For Filebeat < 7.16
@@ -238,8 +238,8 @@ processors:
 
 ::::::{tab-item} Kubernetes
 1. Make sure your application logs to stdout/stderr.
-2. Follow the [Run Filebeat on Kubernetes](beats://docs/reference/filebeat/running-on-kubernetes.md) guide.
-3. Enable [hints-based autodiscover](beats://docs/reference/filebeat/configuration-autodiscover-hints.md) (uncomment the corresponding section in `filebeat-kubernetes.yaml`).
+2. Follow the [Run Filebeat on Kubernetes](beats://reference/filebeat/running-on-kubernetes.md) guide.
+3. Enable [hints-based autodiscover](beats://reference/filebeat/configuration-autodiscover-hints.md) (uncomment the corresponding section in `filebeat-kubernetes.yaml`).
 4. Add these annotations to your pods that log using ECS loggers. This will make sure the logs are parsed appropriately.
 
 ```yaml
@@ -256,8 +256,8 @@ annotations:
 
 ::::::{tab-item} Docker
 1. Make sure your application logs to stdout/stderr.
-2. Follow the [Run Filebeat on Docker](beats://docs/reference/filebeat/running-on-docker.md) guide.
-3. Enable [hints-based autodiscover](beats://docs/reference/filebeat/configuration-autodiscover-hints.md).
+2. Follow the [Run Filebeat on Docker](beats://reference/filebeat/running-on-docker.md) guide.
+3. Enable [hints-based autodiscover](beats://reference/filebeat/configuration-autodiscover-hints.md).
 4. Add these labels to your containers that log using ECS loggers. This will make sure the logs are parsed appropriately.
 
 ```yaml
@@ -273,5 +273,5 @@ labels:
 ::::::
 
 :::::::
-For more information, see the [Filebeat reference](beats://docs/reference/filebeat/configuring-howto-filebeat.md).
+For more information, see the [Filebeat reference](beats://reference/filebeat/configuring-howto-filebeat.md).
 
