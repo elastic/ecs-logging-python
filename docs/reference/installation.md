@@ -13,7 +13,7 @@ $ python -m pip install ecs-logging
 
 ## Getting started [gettingstarted]
 
-`ecs-logging-python` has formatters for the standard library [`logging`](https://docs.python.org/3/library/logging.md) module and the [`structlog`](https://www.structlog.org/en/stable/) package.
+`ecs-logging-python` has formatters for the standard library [`logging`](https://docs.python.org/3/library/logging.html) module and the [`structlog`](https://www.structlog.org/en/stable/) package.
 
 
 ### Standard library logging module [logging]
