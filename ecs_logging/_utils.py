@@ -18,7 +18,13 @@
 import collections.abc
 import json
 import functools
+import sys
 from typing import Any, Dict, Mapping
+
+if sys.version_info >= (3, 9):
+    from collections.abc import MutableMapping
+else:
+    from typing import MutableMapping
 
 
 __all__ = [
@@ -53,9 +59,9 @@ def flatten_dict(value: Mapping[str, Any]) -> Dict[str, Any]:
     return top_level
 
 
-def normalize_dict(value: Dict[str, Any]) -> Dict[str, Any]:
+def normalize_dict(value: MutableMapping[str, Any]) -> MutableMapping[str, Any]:
     """Expands all dotted names to nested dictionaries"""
-    if not isinstance(value, dict):
+    if not isinstance(value, MutableMapping):
         return value
     keys = list(value.keys())
     for key in keys:
@@ -78,7 +84,9 @@ def de_dot(dot_string: str, msg: Any) -> Dict[str, Any]:
     return ret
 
 
-def merge_dicts(from_: Dict[Any, Any], into: Dict[Any, Any]) -> Dict[Any, Any]:
+def merge_dicts(
+    from_: Mapping[Any, Any], into: MutableMapping[Any, Any]
+) -> MutableMapping[Any, Any]:
     """Merge deeply nested dictionary structures.
     When called has side-effects within 'destination'.
     """
@@ -98,7 +106,7 @@ def merge_dicts(from_: Dict[Any, Any], into: Dict[Any, Any]) -> Dict[Any, Any]:
     return into
 
 
-def json_dumps(value: Dict[str, Any]) -> str:
+def json_dumps(value: MutableMapping[str, Any]) -> str:
 
     # Ensure that the first three fields are '@timestamp',
     # 'log.level', and 'message' per ECS spec
