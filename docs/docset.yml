@@ -1,4 +1,6 @@
 project: 'ECS Logging Python'
+products:
+  - id: ecs-logging
 cross_links:
   - apm-agent-python
   - beats
