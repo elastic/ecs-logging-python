@@ -220,6 +220,8 @@ class StdlibFormatter(logging.Formatter):
         # Pull all extras and flatten them to be sent into '_is_field_excluded'
         # since they can be defined as 'extras={"http": {"method": "GET"}}'
         extra_keys = set(available).difference(self._LOGRECORD_DICT)
+        if extra_keys is not None:
+            print("EXTRA KEYS are there: deleteme5")
         extras = flatten_dict({key: available[key] for key in extra_keys})
         # Merge in any global extra's
         if self._extra is not None:
