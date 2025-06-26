@@ -73,7 +73,7 @@ class StdlibFormatter(logging.Formatter):
         "process",
         "message",
     } | _LOGRECORD_DIR
-    converter: Callable[[Union[float, None]], time.struct_time] = staticmethod(
+    converter: Callable[[Optional[float]], time.struct_time] = staticmethod(
         time.gmtime
     )
 
