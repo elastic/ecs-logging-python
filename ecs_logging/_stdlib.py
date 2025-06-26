@@ -46,10 +46,6 @@ except Exception:  # LogRecord signature changed?
     _LOGRECORD_DIR = set()
 
 
-def _converter(secs: Optional[float] = None) -> time.struct_time:
-    return time.gmtime(secs)
-
-
 class StdlibFormatter(logging.Formatter):
     """ECS Formatter for the standard library ``logging`` module"""
 
@@ -77,8 +73,7 @@ class StdlibFormatter(logging.Formatter):
         "process",
         "message",
     } | _LOGRECORD_DIR
-
-    convert = _converter
+    converter: Callable[[Optional[float]], time.struct_time] = staticmethod(time.gmtime)
 
     def __init__(
         self,
