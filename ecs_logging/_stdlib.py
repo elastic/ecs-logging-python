@@ -32,10 +32,10 @@ from ._utils import (
 
 from typing import Any, Callable, Dict, Optional, Sequence, Union
 
-try:
-    from typing import Literal  # type: ignore
-except ImportError:
-    from typing_extensions import Literal  # type: ignore
+if sys.version_info >= (3, 8):
+    from typing import Literal
+else:
+    from typing_extensions import Literal
 
 
 # Load the attributes of a LogRecord so if some are
@@ -105,13 +105,15 @@ class StdlibFormatter(logging.Formatter):
 
                 exclude_keys=["error"]
         """
-        _kwargs = {}
-        if validate is not None:
-            # validate was introduced in py3.8 so we need to only provide it if the user provided it
-            _kwargs["validate"] = validate
-        super().__init__(  # type: ignore[call-arg]
-            fmt=fmt, datefmt=datefmt, style=style, **_kwargs  # type: ignore[arg-type]
-        )
+        # validate was introduced in py3.8 so we need to only provide it if the user provided it
+        if sys.version_info >= (3, 8) and validate is not None:
+            super().__init__(
+                fmt=fmt, datefmt=datefmt, style=style, validate=validate,
+            )
+        else:
+            super().__init__(
+                fmt=fmt, datefmt=datefmt, style=style,
+            )
 
         if stack_trace_limit is not None:
             if not isinstance(stack_trace_limit, int):
