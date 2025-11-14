@@ -98,7 +98,7 @@ def merge_dicts(from_: Dict[Any, Any], into: Dict[Any, Any]) -> Dict[Any, Any]:
     return into
 
 
-def json_dumps(value: Dict[str, Any]) -> str:
+def json_dumps(value: Dict[str, Any], ensure_ascii: bool = True) -> str:
 
     # Ensure that the first three fields are '@timestamp',
     # 'log.level', and 'message' per ECS spec
@@ -124,7 +124,7 @@ def json_dumps(value: Dict[str, Any]) -> str:
         pass
 
     json_dumps = functools.partial(
-        json.dumps, sort_keys=True, separators=(",", ":"), default=_json_dumps_fallback
+        json.dumps, sort_keys=True, separators=(",", ":"), default=_json_dumps_fallback, ensure_ascii=ensure_ascii
     )
 
     # Because we want to use 'sorted_keys=True' we manually build
