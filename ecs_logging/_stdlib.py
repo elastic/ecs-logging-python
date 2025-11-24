@@ -84,6 +84,7 @@ class StdlibFormatter(logging.Formatter):
         stack_trace_limit: Optional[int] = None,
         extra: Optional[Dict[str, Any]] = None,
         exclude_fields: Sequence[str] = (),
+        ensure_ascii: bool = True,
     ) -> None:
         """Initialize the ECS formatter.
 
@@ -133,6 +134,7 @@ class StdlibFormatter(logging.Formatter):
         self._extra = extra
         self._exclude_fields = frozenset(exclude_fields)
         self._stack_trace_limit = stack_trace_limit
+        self.ensure_ascii = ensure_ascii
 
     def _record_error_type(self, record: logging.LogRecord) -> Optional[str]:
         exc_info = record.exc_info
@@ -162,7 +164,7 @@ class StdlibFormatter(logging.Formatter):
 
     def format(self, record: logging.LogRecord) -> str:
         result = self.format_to_ecs(record)
-        return json_dumps(result)
+        return json_dumps(result, ensure_ascii=self.ensure_ascii)
 
     def format_to_ecs(self, record: logging.LogRecord) -> Dict[str, Any]:
         """Function that can be overridden to add additional fields to

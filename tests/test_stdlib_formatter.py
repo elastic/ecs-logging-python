@@ -367,3 +367,107 @@ def test_apm_data_conflicts(spec_validator):
         '"log":{"logger":"logger-name","origin":{"file":{"line":10,"name":"file.py"},"function":"test_function"},'
         '"original":"1: hello"},"service":{"environment":"dev","name":"myapp","version":"1.0.0"}}'
     )
+
+
+def test_ensure_ascii_default():
+    """Test that ensure_ascii defaults to True (escaping non-ASCII characters)"""
+    record = make_record()
+    record.msg = "Hello 世界"
+    record.args = ()
+
+    formatter = ecs_logging.StdlibFormatter(exclude_fields=["process"])
+    result = formatter.format(record)
+
+    # With ensure_ascii=True (default), non-ASCII characters should be escaped
+    assert "\\u4e16\\u754c" in result
+    assert "世界" not in result
+
+    # Verify the JSON is valid
+    parsed = json.loads(result)
+    assert parsed["message"] == "Hello 世界"
+
+
+def test_ensure_ascii_true():
+    """Test that ensure_ascii=True escapes non-ASCII characters"""
+    record = make_record()
+    record.msg = "Café ☕"
+    record.args = ()
+
+    formatter = ecs_logging.StdlibFormatter(
+        exclude_fields=["process"], ensure_ascii=True
+    )
+    result = formatter.format(record)
+
+    # With ensure_ascii=True, non-ASCII characters should be escaped
+    assert "\\u00e9" in result  # é is escaped
+    assert "\\u2615" in result  # ☕ is escaped
+    assert "Café" not in result
+    assert "☕" not in result
+
+    # Verify the JSON is valid and correctly decoded
+    parsed = json.loads(result)
+    assert parsed["message"] == "Café ☕"
+
+
+def test_ensure_ascii_false():
+    """Test that ensure_ascii=False preserves non-ASCII characters"""
+    record = make_record()
+    record.msg = "Hello 世界"
+    record.args = ()
+
+    formatter = ecs_logging.StdlibFormatter(
+        exclude_fields=["process"], ensure_ascii=False
+    )
+    result = formatter.format(record)
+
+    # With ensure_ascii=False, non-ASCII characters should be preserved
+    assert "世界" in result
+    assert "\\u4e16" not in result
+
+    # Verify the JSON is valid
+    parsed = json.loads(result)
+    assert parsed["message"] == "Hello 世界"
+
+
+def test_ensure_ascii_false_with_emoji():
+    """Test that ensure_ascii=False preserves emoji and special characters"""
+    record = make_record()
+    record.msg = "Café ☕ 你好"
+    record.args = ()
+
+    formatter = ecs_logging.StdlibFormatter(
+        exclude_fields=["process"], ensure_ascii=False
+    )
+    result = formatter.format(record)
+
+    # With ensure_ascii=False, all non-ASCII characters should be preserved
+    assert "Café" in result
+    assert "☕" in result
+    assert "你好" in result
+
+    # Verify the JSON is valid and correctly decoded
+    parsed = json.loads(result)
+    assert parsed["message"] == "Café ☕ 你好"
+
+
+def test_ensure_ascii_with_extra_fields():
+    """Test that ensure_ascii works with extra fields containing non-ASCII"""
+    record = make_record()
+    record.msg = "Test message"
+    record.args = ()
+
+    formatter = ecs_logging.StdlibFormatter(
+        exclude_fields=["process"],
+        ensure_ascii=False,
+        extra={"user": "用户", "city": "北京"},
+    )
+    result = formatter.format(record)
+
+    # With ensure_ascii=False, non-ASCII in extra fields should be preserved
+    assert "用户" in result
+    assert "北京" in result
+
+    # Verify the JSON is valid
+    parsed = json.loads(result)
+    assert parsed["user"] == "用户"
+    assert parsed["city"] == "北京"

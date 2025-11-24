@@ -26,6 +26,12 @@ from ._utils import json_dumps, normalize_dict
 class StructlogFormatter:
     """ECS formatter for the ``structlog`` module"""
 
+    def __init__(
+        self,
+        ensure_ascii: bool = True,
+    ) -> None:
+        self.ensure_ascii = ensure_ascii
+
     def __call__(self, _: Any, name: str, event_dict: Dict[str, Any]) -> str:
 
         # Handle event -> message now so that stuff like `event.dataset` doesn't
@@ -56,4 +62,4 @@ class StructlogFormatter:
         return event_dict
 
     def _json_dumps(self, value: Dict[str, Any]) -> str:
-        return json_dumps(value=value)
+        return json_dumps(value=value, ensure_ascii=self.ensure_ascii)

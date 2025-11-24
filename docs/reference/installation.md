@@ -101,6 +101,25 @@ formatter = StdlibFormatter(
 ```
 
 
+#### Controlling ASCII encoding [_controlling_ascii_encoding]
+
+By default, the `StdlibFormatter` escapes non-ASCII characters in the JSON output using Unicode escape sequences. If you want to preserve non-ASCII characters (such as Chinese, Japanese, emojis, etc.) in their original form, you can use the `ensure_ascii` parameter:
+
+```python
+from ecs_logging import StdlibFormatter
+
+# Default behavior - non-ASCII characters are escaped
+formatter = StdlibFormatter()
+# Output: {"message":"Hello \\u4e16\\u754c"}
+
+# Preserve non-ASCII characters
+formatter = StdlibFormatter(ensure_ascii=False)
+# Output: {"message":"Hello 世界"}
+```
+
+This is particularly useful when working with internationalized applications or when you need to maintain readability of logs containing non-ASCII characters.
+
+
 ### Structlog Example [structlog]
 
 Note that the structlog processor should be the last processor in the list, as it handles the conversion to JSON as well as the ECS field enrichment.
@@ -142,6 +161,27 @@ logger = logger.bind(**{
 
 # Emit a log!
 logger.debug("Example message!")
+```
+
+
+#### Controlling ASCII encoding for Structlog [_structlog_ascii_encoding]
+
+Similar to `StdlibFormatter`, the `StructlogFormatter` also supports the `ensure_ascii` parameter to control whether non-ASCII characters are escaped:
+
+```python
+import structlog
+import ecs_logging
+
+# Configure Structlog with ensure_ascii=False to preserve non-ASCII characters
+structlog.configure(
+    processors=[ecs_logging.StructlogFormatter(ensure_ascii=False)],
+    wrapper_class=structlog.BoundLogger,
+    context_class=dict,
+    logger_factory=structlog.PrintLoggerFactory(),
+)
+
+logger = structlog.get_logger("app")
+logger.info("你好世界")  # Non-ASCII characters will be preserved in output
 ```
 
 ```json
