@@ -124,7 +124,11 @@ def json_dumps(value: Dict[str, Any], ensure_ascii: bool = True) -> str:
         pass
 
     json_dumps = functools.partial(
-        json.dumps, sort_keys=True, separators=(",", ":"), default=_json_dumps_fallback, ensure_ascii=ensure_ascii
+        json.dumps,
+        sort_keys=True,
+        separators=(",", ":"),
+        default=_json_dumps_fallback,
+        ensure_ascii=ensure_ascii,
     )
 
     # Because we want to use 'sorted_keys=True' we manually build

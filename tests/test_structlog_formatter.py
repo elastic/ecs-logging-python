@@ -114,14 +114,14 @@ def test_exception_log_is_ecs_compliant_when_used_with_format_exc_info(
 def test_ensure_ascii_default(time):
     """Test that ensure_ascii defaults to True (escaping non-ASCII characters)"""
     time.return_value = 1584720997.187709
-    
+
     formatter = ecs_logging.StructlogFormatter()
     result = formatter(None, "debug", {"event": "Hello 世界", "log.logger": "test"})
-    
+
     # With ensure_ascii=True (default), non-ASCII characters should be escaped
     assert "\\u4e16\\u754c" in result
     assert "世界" not in result
-    
+
     # Verify the JSON is valid
     parsed = json.loads(result)
     assert parsed["message"] == "Hello 世界"
@@ -131,16 +131,16 @@ def test_ensure_ascii_default(time):
 def test_ensure_ascii_true(time):
     """Test that ensure_ascii=True escapes non-ASCII characters"""
     time.return_value = 1584720997.187709
-    
+
     formatter = ecs_logging.StructlogFormatter(ensure_ascii=True)
     result = formatter(None, "info", {"event": "Café ☕", "log.logger": "test"})
-    
+
     # With ensure_ascii=True, non-ASCII characters should be escaped
     assert "\\u00e9" in result  # é is escaped
     assert "\\u2615" in result  # ☕ is escaped
     assert "Café" not in result
     assert "☕" not in result
-    
+
     # Verify the JSON is valid and correctly decoded
     parsed = json.loads(result)
     assert parsed["message"] == "Café ☕"
@@ -150,14 +150,14 @@ def test_ensure_ascii_true(time):
 def test_ensure_ascii_false(time):
     """Test that ensure_ascii=False preserves non-ASCII characters"""
     time.return_value = 1584720997.187709
-    
+
     formatter = ecs_logging.StructlogFormatter(ensure_ascii=False)
     result = formatter(None, "debug", {"event": "Hello 世界", "log.logger": "test"})
-    
+
     # With ensure_ascii=False, non-ASCII characters should be preserved
     assert "世界" in result
     assert "\\u4e16" not in result
-    
+
     # Verify the JSON is valid
     parsed = json.loads(result)
     assert parsed["message"] == "Hello 世界"
@@ -167,15 +167,15 @@ def test_ensure_ascii_false(time):
 def test_ensure_ascii_false_with_emoji(time):
     """Test that ensure_ascii=False preserves emoji and special characters"""
     time.return_value = 1584720997.187709
-    
+
     formatter = ecs_logging.StructlogFormatter(ensure_ascii=False)
     result = formatter(None, "info", {"event": "Café ☕ 你好", "log.logger": "test"})
-    
+
     # With ensure_ascii=False, all non-ASCII characters should be preserved
     assert "Café" in result
     assert "☕" in result
     assert "你好" in result
-    
+
     # Verify the JSON is valid and correctly decoded
     parsed = json.loads(result)
     assert parsed["message"] == "Café ☕ 你好"
@@ -185,7 +185,7 @@ def test_ensure_ascii_false_with_emoji(time):
 def test_ensure_ascii_with_custom_fields(time):
     """Test that ensure_ascii works with custom fields containing non-ASCII"""
     time.return_value = 1584720997.187709
-    
+
     formatter = ecs_logging.StructlogFormatter(ensure_ascii=False)
     result = formatter(
         None,
@@ -197,11 +197,11 @@ def test_ensure_ascii_with_custom_fields(time):
             "city": "北京",
         },
     )
-    
+
     # With ensure_ascii=False, non-ASCII in custom fields should be preserved
     assert "用户" in result
     assert "北京" in result
-    
+
     # Verify the JSON is valid
     parsed = json.loads(result)
     assert parsed["user"] == "用户"
