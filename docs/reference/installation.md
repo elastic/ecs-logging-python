@@ -103,6 +103,11 @@ formatter = StdlibFormatter(
 
 #### Controlling ASCII encoding [_controlling_ascii_encoding]
 
+```{applies_to}
+product:
+  ecs_logging_python: ga 2.3.0
+```
+
 By default, the `StdlibFormatter` escapes non-ASCII characters in the JSON output using Unicode escape sequences. If you want to preserve non-ASCII characters (such as Chinese, Japanese, emojis, etc.) in their original form, you can use the `ensure_ascii` parameter:
 
 ```python
@@ -165,6 +170,11 @@ logger.debug("Example message!")
 
 
 #### Controlling ASCII encoding for Structlog [_structlog_ascii_encoding]
+
+```{applies_to}
+product:
+  ecs_logging_python: ga 2.3.0
+```
 
 Similar to `StdlibFormatter`, the `StructlogFormatter` also supports the `ensure_ascii` parameter to control whether non-ASCII characters are escaped:
 
