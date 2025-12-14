@@ -30,7 +30,7 @@ jobs:
           subject-path: "${{ github.workspace }}/dist/*"
 
       - name: Upload Packages
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: packages
           path: |
@@ -45,7 +45,7 @@ jobs:
     permissions:
       id-token: write # IMPORTANT: this permission is mandatory for trusted publishing
     steps:
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v7
         with:
           name: packages
           path: dist
