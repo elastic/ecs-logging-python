@@ -161,21 +161,25 @@ class StdlibFormatter(logging.Formatter):
         result = self.format_to_ecs(record)
         return json_dumps(result, ensure_ascii=self.ensure_ascii)
 
-    def format_to_ecs(self, record: logging.LogRecord) -> Dict[str, Any]:
-        """Function that can be overridden to add additional fields to
-        (or remove fields from) the JSON before being dumped into a string.
+    @property
+    @lru_cache
+    def _extractors(self) -> Dict[str, Callable[[logging.LogRecord], Any]]:
+        """Property that can be overridden to add additional field
+        extractors to (or remove fields from) the JSON before being
+        dumped into a string.
 
          .. code-block: python
 
             class MyFormatter(StdlibFormatter):
-                def format_to_ecs(self, record):
-                  result = super().format_to_ecs(record)
-                  del result["log"]["original"]   # remove unwanted field(s)
-                  result["my_field"] = "my_value" # add custom field
-                  return result
+                @property
+                @lru_cache
+                def _extractors(self):
+                    extractors = super()._extractors
+                    del extractors["log.original"]   # remove unwanted field(s)
+                    extractors["my_field"] = self._my_extractor # add custom field
+                    return extractors
         """
-
-        extractors: Dict[str, Callable[[logging.LogRecord], Any]] = {
+        return {
             "@timestamp": self._record_timestamp,
             "ecs.version": lambda _: ECS_VERSION,
             "log.level": lambda r: (r.levelname.lower() if r.levelname else None),
@@ -193,11 +197,24 @@ class StdlibFormatter(logging.Formatter):
             "error.stack_trace": self._record_error_stack_trace,
         }
 
+    def format_to_ecs(self, record: logging.LogRecord) -> Dict[str, Any]:
+        """Function that can be overridden to add additional fields to
+        (or remove fields from) the JSON before being dumped into a string.
+
+         .. code-block: python
+
+            class MyFormatter(StdlibFormatter):
+                def format_to_ecs(self, record):
+                  result = super().format_to_ecs(record)
+                  del result["log"]["original"]   # remove unwanted field(s)
+                  result["my_field"] = "my_value" # add custom field
+                  return result
+        """
         result: Dict[str, Any] = {}
-        for field in set(extractors.keys()).difference(self._exclude_fields):
+        for field in set(self._extractors.keys()).difference(self._exclude_fields):
             if self._is_field_excluded(field):
                 continue
-            value = extractors[field](record)
+            value = self._extractors[field](record)
             if value is not None:
                 # special case ecs.version that should not be de-dotted
                 if field == "ecs.version":
