@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.3.0 (2026-01-19)
+
+- Add support for Python 3.14 ([#195](https://github.com/elastic/ecs-logging-python/pull/195))
+- Add `ensure_ascii` parameter to `StdlibFormatter` and `StructlogFormatter` to control non-ASCII character escaping ([#188](https://github.com/elastic/ecs-logging-python/pull/188))
+- Fix linting with newer mypy ([#172](https://github.com/elastic/ecs-logging-python/pull/172))
+- Migrate docs from AsciiDoc to Markdown ([#157](https://github.com/elastic/ecs-logging-python/pull/157))
+- Bump baseline supported version to Python 3.8 and add support for Python 3.13 ([#154](https://github.com/elastic/ecs-logging-python/pull/154))
+
 ## 2.2.0 (2024-06-28)
 
 - Rewrite type annotations ([#119](https://github.com/elastic/ecs-logging-python/pull/119))
