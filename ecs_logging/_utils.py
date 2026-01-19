@@ -20,7 +20,6 @@ import json
 import functools
 from typing import Any, Dict, Mapping
 
-
 __all__ = [
     "normalize_dict",
     "de_dot",

@@ -17,7 +17,6 @@
 
 import nox
 
-
 SOURCE_FILES = ("noxfile.py", "tests/", "ecs_logging/")
 
 
