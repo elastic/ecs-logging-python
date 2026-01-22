@@ -229,7 +229,9 @@ def test_stack_trace_limit_traceback(
 
     stream = StringIO()
     handler = logging.StreamHandler(stream)
-    handler.setFormatter(ecs_logging.StdlibFormatter(stack_trace_limit=stack_trace_limit))
+    handler.setFormatter(
+        ecs_logging.StdlibFormatter(stack_trace_limit=stack_trace_limit)
+    )
     logger.addHandler(handler)
     logger.setLevel(logging.DEBUG)
 

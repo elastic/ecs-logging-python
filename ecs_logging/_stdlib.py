@@ -118,9 +118,7 @@ class StdlibFormatter(logging.Formatter):
 
         if stack_trace_limit is not None:
             if not isinstance(stack_trace_limit, int):
-                raise TypeError(
-                    "'stack_trace_limit' must be None or an integer"
-                )
+                raise TypeError("'stack_trace_limit' must be None or an integer")
 
         if (
             not isinstance(exclude_fields, collections.abc.Sequence)
