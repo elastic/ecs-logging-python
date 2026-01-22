@@ -208,7 +208,16 @@ def test_exc_info_false_does_not_raise(logger):
     assert "error" not in ecs
 
 
-def test_stack_trace_limit_traceback(logger):
+@pytest.mark.parametrize(
+    ("stack_trace_limit", "expected_in", "expected_not_in"),
+    [
+        (2, ("f()", "g()"), ("h()",)),
+        (-2, ("h()",), ("f()", "g()")),
+    ],
+)
+def test_stack_trace_limit_traceback(
+    stack_trace_limit, expected_in, expected_not_in, logger
+):
     def f():
         g()
 
@@ -220,7 +229,7 @@ def test_stack_trace_limit_traceback(logger):
 
     stream = StringIO()
     handler = logging.StreamHandler(stream)
-    handler.setFormatter(ecs_logging.StdlibFormatter(stack_trace_limit=2))
+    handler.setFormatter(ecs_logging.StdlibFormatter(stack_trace_limit=stack_trace_limit))
     logger.addHandler(handler)
     logger.setLevel(logging.DEBUG)
 
@@ -231,8 +240,8 @@ def test_stack_trace_limit_traceback(logger):
 
     ecs = json.loads(stream.getvalue().rstrip())
     error_stack_trace = ecs["error"].pop("stack_trace")
-    assert all(x in error_stack_trace for x in ("f()", "g()"))
-    assert "h()" not in error_stack_trace
+    assert all(x in error_stack_trace for x in expected_in)
+    assert all(x not in error_stack_trace for x in expected_not_in)
     assert ecs["error"] == {
         "message": "error!",
         "type": "ValueError",
@@ -245,11 +254,7 @@ def test_stack_trace_limit_traceback(logger):
 def test_stack_trace_limit_types_and_values():
     with pytest.raises(TypeError) as e:
         ecs_logging.StdlibFormatter(stack_trace_limit="a")
-    assert str(e.value) == "'stack_trace_limit' must be None, or a non-negative integer"
-
-    with pytest.raises(ValueError) as e:
-        ecs_logging.StdlibFormatter(stack_trace_limit=-1)
-    assert str(e.value) == "'stack_trace_limit' must be None, or a non-negative integer"
+    assert str(e.value) == "'stack_trace_limit' must be None or an integer"
 
 
 @pytest.mark.parametrize(
