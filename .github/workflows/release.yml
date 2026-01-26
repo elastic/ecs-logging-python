@@ -13,9 +13,10 @@ permissions:
 jobs:
   packages:
     permissions:
+      artifact-metadata: write
       attestations: write
-      id-token: write
       contents: read
+      id-token: write
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
