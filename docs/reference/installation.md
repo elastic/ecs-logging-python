@@ -85,7 +85,7 @@ formatter = StdlibFormatter(
 
 #### Limiting stack traces [_limiting_stack_traces]
 
-The `StdlibLogger` automatically gathers `exc_info` into ECS `error.*` fields. If you’d like to control the number of stack frames that are included in `error.stack_trace` you can use the `stack_trace_limit` parameter (by default all frames are collected):
+The `StdlibLogger` automatically gathers `exc_info` into ECS `error.*` fields. If you’d like to control the number of stack frames that are included in `error.stack_trace` you can use the `stack_trace_limit` parameter (by default all frames are collected). Positive values include frames starting from the caller's frame. Negative values include the last `N` frames (closest to the error):
 
 ```python
 from ecs_logging import StdlibFormatter
@@ -93,6 +93,10 @@ from ecs_logging import StdlibFormatter
 formatter = StdlibFormatter(
     # Only collects 3 stack frames
     stack_trace_limit=3,
+)
+formatter = StdlibFormatter(
+    # Collects the last 2 frames (closest to the error)
+    stack_trace_limit=-2,
 )
 formatter = StdlibFormatter(
     # Disable stack trace collection
@@ -322,4 +326,3 @@ labels:
 
 :::::::
 For more information, see the [Filebeat reference](beats://reference/filebeat/configuring-howto-filebeat.md).
-

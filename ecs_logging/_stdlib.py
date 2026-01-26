@@ -91,7 +91,9 @@ class StdlibFormatter(logging.Formatter):
         :param int stack_trace_limit:
             Specifies the maximum number of frames to include for stack
             traces. Defaults to ``None`` which includes all available frames.
-            Setting this to zero will suppress stack traces.
+            Setting this to zero will suppress stack traces. Positive values
+            include frames starting from the caller's frame. Negative values
+            include the last ``N`` frames (closest to the error).
             This setting doesn't affect ``LogRecord.stack_info`` because
             this attribute is typically already pre-formatted.
         :param Optional[Dict[str, Any]] extra:
@@ -116,13 +118,7 @@ class StdlibFormatter(logging.Formatter):
 
         if stack_trace_limit is not None:
             if not isinstance(stack_trace_limit, int):
-                raise TypeError(
-                    "'stack_trace_limit' must be None, or a non-negative integer"
-                )
-            elif stack_trace_limit < 0:
-                raise ValueError(
-                    "'stack_trace_limit' must be None, or a non-negative integer"
-                )
+                raise TypeError("'stack_trace_limit' must be None or an integer")
 
         if (
             not isinstance(exclude_fields, collections.abc.Sequence)
@@ -283,7 +279,7 @@ class StdlibFormatter(logging.Formatter):
         if (
             record.exc_info
             and record.exc_info[2] is not None
-            and (self._stack_trace_limit is None or self._stack_trace_limit > 0)
+            and (self._stack_trace_limit is None or self._stack_trace_limit != 0)
         ):
             return (
                 "".join(format_tb(record.exc_info[2], limit=self._stack_trace_limit))
