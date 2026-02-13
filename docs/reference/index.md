@@ -2,6 +2,11 @@
 mapped_pages:
   - https://www.elastic.co/guide/en/ecs-logging/python/current/intro.html
   - https://www.elastic.co/guide/en/ecs-logging/python/current/index.html
+applies_to:
+  stack: ga
+  serverless: ga
+products:
+  - id: ecs-logging
 ---
 
 # ECS Logging Python [intro]
