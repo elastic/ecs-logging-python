@@ -26,7 +26,7 @@ jobs:
       - run: python -m build
 
       - name: generate build provenance
-        uses: actions/attest-build-provenance@v3
+        uses: actions/attest@v4
         with:
           subject-path: "${{ github.workspace }}/dist/*"
 
