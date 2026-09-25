@@ -219,10 +219,12 @@ class StdlibFormatter(logging.Formatter):
         # since they can be defined as 'extras={"http": {"method": "GET"}}'
         extra_keys = set(available).difference(self._LOGRECORD_DICT)
         extras = flatten_dict({key: available[key] for key in extra_keys})
-        # Merge in any global extra's
+        # Merge in any global extra's. Values set on the record take
+        # precedence, and both use the same flattened (dotted) keys so
+        # that the same field set in both places doesn't conflict below.
         if self._extra is not None:
-            for field, value in self._extra.items():
-                merge_dicts(de_dot(field, value), extras)
+            for field, value in flatten_dict(self._extra).items():
+                extras.setdefault(field, value)
 
         # Pop all Elastic APM extras and add them
         # to standard tracing ECS fields.
