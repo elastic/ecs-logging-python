@@ -208,6 +208,23 @@ def test_exc_info_false_does_not_raise(logger):
     assert "error" not in ecs
 
 
+def test_record_with_exc_info_true_does_not_raise():
+    # Records rebuilt with logging.makeLogRecord() (e.g. from a SocketHandler
+    # or QueueHandler payload) can carry exc_info=True instead of a tuple.
+    formatter = ecs_logging.StdlibFormatter()
+    try:
+        raise ValueError("boom")
+    except ValueError:
+        record = logging.makeLogRecord({"msg": "there was an error", "exc_info": True})
+        ecs = json.loads(formatter.format(record))
+
+    assert ecs["error"]["type"] == "ValueError"
+    assert ecs["error"]["message"] == "boom"
+    assert "test_record_with_exc_info_true_does_not_raise" in (
+        ecs["error"]["stack_trace"]
+    )
+
+
 @pytest.mark.parametrize(
     ("stack_trace_limit", "expected_in", "expected_not_in"),
     [

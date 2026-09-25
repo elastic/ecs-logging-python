@@ -276,14 +276,16 @@ class StdlibFormatter(logging.Formatter):
         # Using stack_info=True will add 'error.stack_trace' even
         # if the type is not 'error', exc_info=True only gathers
         # when there's an active exception.
+        exc_info = record.exc_info
+        if isinstance(exc_info, bool):
+            exc_info = sys.exc_info() if exc_info else None
         if (
-            record.exc_info
-            and record.exc_info[2] is not None
+            exc_info
+            and exc_info[2] is not None
             and (self._stack_trace_limit is None or self._stack_trace_limit != 0)
         ):
             return (
-                "".join(format_tb(record.exc_info[2], limit=self._stack_trace_limit))
-                or None
+                "".join(format_tb(exc_info[2], limit=self._stack_trace_limit)) or None
             )
         # LogRecord only has 'stack_info' if it's passed via .log(..., stack_info=True)
         stack_info = getattr(record, "stack_info", None)
