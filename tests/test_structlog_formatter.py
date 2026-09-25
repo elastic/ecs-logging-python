@@ -206,3 +206,36 @@ def test_ensure_ascii_with_custom_fields(time):
     parsed = json.loads(result)
     assert parsed["user"] == "用户"
     assert parsed["city"] == "北京"
+
+
+@pytest.mark.parametrize(
+    ["method_name", "level"],
+    [
+        ("exception", "error"),
+        ("warn", "warning"),
+        ("warning", "warning"),
+        ("critical", "critical"),
+    ],
+)
+def test_method_name_mapped_to_log_level(event_dict, method_name, level):
+    formatter = ecs_logging.StructlogFormatter()
+    ecs = json.loads(formatter(None, method_name, event_dict))
+    assert ecs["log.level"] == level
+
+
+def test_exception_method_logs_error_level():
+    stream = StringIO()
+    structlog.configure(
+        processors=[ecs_logging.StructlogFormatter()],
+        wrapper_class=structlog.stdlib.BoundLogger,
+        context_class=dict,
+        logger_factory=structlog.PrintLoggerFactory(stream),
+    )
+    logger = structlog.get_logger("logger-name")
+    try:
+        1 / 0
+    except ZeroDivisionError:
+        logger.exception("oops")
+
+    ecs = json.loads(stream.getvalue().rstrip())
+    assert ecs["log.level"] == "error"

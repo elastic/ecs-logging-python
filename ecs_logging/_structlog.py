@@ -22,6 +22,10 @@ from typing import Any, Dict
 from ._meta import ECS_VERSION
 from ._utils import json_dumps, normalize_dict
 
+# Logger method names that aren't level names, mapped the same way as
+# structlog's own add_log_level processor does
+_METHOD_TO_LEVEL = {"exception": "error", "warn": "warning"}
+
 
 class StructlogFormatter:
     """ECS formatter for the ``structlog`` module"""
@@ -38,7 +42,9 @@ class StructlogFormatter:
         # cause problems down the line
         event_dict["message"] = str(event_dict.pop("event"))
         event_dict = normalize_dict(event_dict)
-        event_dict.setdefault("log", {}).setdefault("level", name.lower())
+        level = name.lower()
+        level = _METHOD_TO_LEVEL.get(level, level)
+        event_dict.setdefault("log", {}).setdefault("level", level)
         event_dict = self.format_to_ecs(event_dict)
         return self._json_dumps(event_dict)
 
