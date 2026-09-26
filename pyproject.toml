@@ -28,6 +28,7 @@ requires-python = ">=3.8"
 
 [tool.flit.metadata.requires-extra]
 develop = [
+    "exceptiongroup; python_version < '3.11'",
     "pytest",
     "pytest-cov",
     "mock",

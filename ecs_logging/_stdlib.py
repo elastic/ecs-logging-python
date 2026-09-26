@@ -30,7 +30,21 @@ from ._utils import (
     merge_dicts,
 )
 
-from typing import Any, Callable, Dict, Optional, Sequence, Union
+from typing import Any, Callable, Dict, Optional, Sequence, Tuple, Type, Union
+
+_EXCEPTION_GROUP_TYPES: Tuple[Type[BaseException], ...] = ()
+if sys.version_info >= (3, 11):
+    from builtins import BaseExceptionGroup
+    from traceback import format_exception
+
+    _EXCEPTION_GROUP_TYPES = (BaseExceptionGroup,)
+else:
+    try:
+        from exceptiongroup import BaseExceptionGroup, format_exception
+    except ImportError:
+        pass
+    else:
+        _EXCEPTION_GROUP_TYPES = (BaseExceptionGroup,)
 
 try:
     from typing import Literal  # type: ignore
@@ -281,6 +295,15 @@ class StdlibFormatter(logging.Formatter):
             and record.exc_info[2] is not None
             and (self._stack_trace_limit is None or self._stack_trace_limit != 0)
         ):
+            if isinstance(record.exc_info[1], _EXCEPTION_GROUP_TYPES):
+                return (
+                    "".join(
+                        format_exception(
+                            record.exc_info[1], limit=self._stack_trace_limit
+                        )
+                    )
+                    or None
+                )
             return (
                 "".join(format_tb(record.exc_info[2], limit=self._stack_trace_limit))
                 or None
