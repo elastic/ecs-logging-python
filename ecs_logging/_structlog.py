@@ -17,7 +17,13 @@
 
 import time
 import datetime
-from typing import Any, Dict
+import sys
+from typing import Any, Dict, TypeVar
+
+if sys.version_info >= (3, 9):
+    from collections.abc import MutableMapping
+else:
+    from typing import MutableMapping
 
 from ._meta import ECS_VERSION
 from ._utils import json_dumps, normalize_dict
@@ -25,6 +31,7 @@ from ._utils import json_dumps, normalize_dict
 # Logger method names that aren't level names, mapped the same way as
 # structlog's own add_log_level processor does
 _METHOD_TO_LEVEL = {"exception": "error", "warn": "warning"}
+_T = TypeVar("_T", bound=MutableMapping[str, Any])
 
 
 class StructlogFormatter:
@@ -36,19 +43,19 @@ class StructlogFormatter:
     ) -> None:
         self.ensure_ascii = ensure_ascii
 
-    def __call__(self, _: Any, name: str, event_dict: Dict[str, Any]) -> str:
-
+    def __call__(self, _: Any, name: str, event_dict: MutableMapping[str, Any]) -> str:
+        event = dict(event_dict) if not isinstance(event_dict, dict) else event_dict
         # Handle event -> message now so that stuff like `event.dataset` doesn't
         # cause problems down the line
-        event_dict["message"] = str(event_dict.pop("event"))
-        event_dict = normalize_dict(event_dict)
+        event["message"] = str(event.pop("event"))
+        event = normalize_dict(event)
         level = name.lower()
         level = _METHOD_TO_LEVEL.get(level, level)
-        event_dict.setdefault("log", {}).setdefault("level", level)
-        event_dict = self.format_to_ecs(event_dict)
-        return self._json_dumps(event_dict)
+        event.setdefault("log", {}).setdefault("level", level)
+        event = self.format_to_ecs(event)
+        return self._json_dumps(event)
 
-    def format_to_ecs(self, event_dict: Dict[str, Any]) -> Dict[str, Any]:
+    def format_to_ecs(self, event_dict: _T) -> _T:
         if "@timestamp" not in event_dict:
             event_dict["@timestamp"] = (
                 datetime.datetime.fromtimestamp(

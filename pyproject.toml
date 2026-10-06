@@ -33,6 +33,7 @@ develop = [
     "mock",
     "structlog",
     "elastic-apm",
+    "mypy",
 ]
 
 [tool.flit.metadata.urls]
