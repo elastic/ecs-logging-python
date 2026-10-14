@@ -32,6 +32,13 @@ def flatten_dict(value: Mapping[str, Any]) -> Dict[str, Any]:
     """Adds dots to all nested fields in dictionaries.
     Raises an error if there are entries which are represented
     with different forms of nesting. (ie {"a": {"b": 1}, "a.b": 2})
+
+    >>> flatten_dict({"a": {"b": 1, "c": 2}})
+    {'a.b': 1, 'a.c': 2}
+    >>> flatten_dict({"a": {"b": 1}, "a.b": 2})
+    Traceback (most recent call last):
+        ...
+    ValueError: Duplicate entry for 'a.b' with different nesting
     """
     top_level = {}
     for key, val in value.items():
@@ -53,7 +60,13 @@ def flatten_dict(value: Mapping[str, Any]) -> Dict[str, Any]:
 
 
 def normalize_dict(value: Dict[str, Any]) -> Dict[str, Any]:
-    """Expands all dotted names to nested dictionaries"""
+    """Expands all dotted names to nested dictionaries.
+
+    >>> normalize_dict({"a.b": 1, "a.c": 2})
+    {'a': {'b': 1, 'c': 2}}
+    >>> normalize_dict({"x": [{"a.b": 1}]})
+    {'x': [{'a': {'b': 1}}]}
+    """
     if not isinstance(value, dict):
         return value
     keys = list(value.keys())
@@ -69,7 +82,13 @@ def normalize_dict(value: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def de_dot(dot_string: str, msg: Any) -> Dict[str, Any]:
-    """Turn value and dotted string key into a nested dictionary"""
+    """Turn value and dotted string key into a nested dictionary.
+
+    >>> de_dot("a.b.c", 1)
+    {'a': {'b': {'c': 1}}}
+    >>> de_dot("x", "hello")
+    {'x': 'hello'}
+    """
     arr = dot_string.split(".")
     ret = {arr[-1]: msg}
     for i in range(len(arr) - 2, -1, -1):
@@ -80,6 +99,11 @@ def de_dot(dot_string: str, msg: Any) -> Dict[str, Any]:
 def merge_dicts(from_: Dict[Any, Any], into: Dict[Any, Any]) -> Dict[Any, Any]:
     """Merge deeply nested dictionary structures.
     When called has side-effects within 'destination'.
+
+    >>> merge_dicts({"a": 1, "b": 2}, {})
+    {'a': 1, 'b': 2}
+    >>> merge_dicts({"a": {"b": 1}}, {"a": {"c": 2}})
+    {'a': {'c': 2, 'b': 1}}
     """
     for key, value in from_.items():
         into.setdefault(key, {})
@@ -98,7 +122,18 @@ def merge_dicts(from_: Dict[Any, Any], into: Dict[Any, Any]) -> Dict[Any, Any]:
 
 
 def json_dumps(value: Dict[str, Any], ensure_ascii: bool = True) -> str:
+    """Serialize a dict to a JSON string with ECS field ordering.
 
+    The first three output fields are always ``@timestamp``, ``log.level``,
+    and ``message`` (when present); remaining fields are sorted alphabetically.
+
+    Note: this function mutates the input dictionary.
+
+    >>> json_dumps({"@timestamp": "2021-01-01", "log": {"level": "info"}, "message": "hello"})
+    '{"@timestamp":"2021-01-01","log.level":"info","message":"hello"}'
+    >>> json_dumps({"custom": "value", "message": "hello"})
+    '{"message":"hello","custom":"value"}'
+    """
     # Ensure that the first three fields are '@timestamp',
     # 'log.level', and 'message' per ECS spec
     ordered_fields = []
