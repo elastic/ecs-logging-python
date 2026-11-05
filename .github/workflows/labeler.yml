@@ -22,6 +22,7 @@ jobs:
     - name: Add agent-python label
       uses: actions-ecosystem/action-add-labels@bd52874380e3909a1ac983768df6976535ece7f8 # v1.1.0
       with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
         labels: agent-python
 
     - name: Get token
@@ -42,6 +43,7 @@ jobs:
       if: contains(steps.is_elastic_member.outputs.result, 'false') && github.actor != 'dependabot[bot]' && github.actor != 'apmmachine'
       uses: actions-ecosystem/action-add-labels@bd52874380e3909a1ac983768df6976535ece7f8 # v1.1.0
       with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
         labels: |
           community
           triage
