@@ -20,7 +20,7 @@ import datetime
 from typing import Any, Dict
 
 from ._meta import ECS_VERSION
-from ._utils import json_dumps, normalize_dict
+from ._utils import json_dumps, merge_dicts, normalize_dict
 
 # Logger method names that aren't level names, mapped the same way as
 # structlog's own add_log_level processor does
@@ -44,7 +44,13 @@ class StructlogFormatter:
         event_dict = normalize_dict(event_dict)
         level = name.lower()
         level = _METHOD_TO_LEVEL.get(level, level)
-        event_dict.setdefault("log", {}).setdefault("level", level)
+        if isinstance(event_dict.get("log", {}), dict):
+            event_dict.setdefault("log", {}).setdefault("level", level)
+        else:
+            # 'log' is already set to a non-dict, so it conflicts with
+            # log.level. Route it through merge_dicts to report the conflict
+            # the same way a dotted-key conflict is reported.
+            merge_dicts({"log": {"level": level}}, event_dict)
         event_dict = self.format_to_ecs(event_dict)
         return self._json_dumps(event_dict)
 
@@ -59,10 +65,10 @@ class StructlogFormatter:
 
         if "exception" in event_dict:
             stack_trace = event_dict.pop("exception")
-            if "error" in event_dict:
-                event_dict["error"]["stack_trace"] = stack_trace
-            else:
-                event_dict["error"] = {"stack_trace": stack_trace}
+            # merge_dicts rather than a direct assignment so that an 'error'
+            # key that is already set to a non-dict reports the conflict
+            # instead of raising from the subscript.
+            merge_dicts({"error": {"stack_trace": stack_trace}}, event_dict)
 
         event_dict.setdefault("ecs.version", ECS_VERSION)
         return event_dict
