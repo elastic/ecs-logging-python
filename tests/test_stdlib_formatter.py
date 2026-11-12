@@ -70,6 +70,37 @@ def test_extra_global_is_merged(spec_validator):
     )
 
 
+def test_extra_global_with_elasticapm_service_name():
+    # Elastic APM log correlation adds elasticapm_service_name to every record
+    formatter = ecs_logging.StdlibFormatter(extra={"service.name": "configured"})
+    record = make_record()
+    record.elasticapm_service_name = "from-apm"
+
+    ecs = json.loads(formatter.format(record))
+    assert ecs["service"] == {"name": "configured"}
+
+
+def test_extra_on_record_overrides_extra_global():
+    formatter = ecs_logging.StdlibFormatter(
+        extra={"service": {"name": "global", "environment": "dev"}}
+    )
+    record = make_record()
+    record.__dict__["service.name"] = "record"
+
+    ecs = json.loads(formatter.format(record))
+    assert ecs["service"] == {"name": "record", "environment": "dev"}
+
+
+def test_extra_global_can_be_excluded():
+    formatter = ecs_logging.StdlibFormatter(
+        extra={"service": {"name": "svc", "environment": "dev"}},
+        exclude_fields=["service.environment"],
+    )
+
+    ecs = json.loads(formatter.format(make_record()))
+    assert ecs["service"] == {"name": "svc"}
+
+
 def test_can_be_overridden(spec_validator):
     class CustomFormatter(ecs_logging.StdlibFormatter):
         def format_to_ecs(self, record):
