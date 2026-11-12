@@ -22,6 +22,7 @@ import pytest
 import json
 import time
 import random
+import sys
 import ecs_logging
 from io import StringIO
 
@@ -191,6 +192,46 @@ def test_stack_trace_limit_disabled(stack_trace_limit, logger):
     assert ecs["log.level"] == "info"
     assert ecs["message"] == "there was an error"
     assert ecs["log"]["original"] == "there was an error"
+
+
+@pytest.mark.parametrize("stack_trace_limit", [None, 1, -1, 0])
+def test_nested_exception_group(stack_trace_limit, logger):
+    if sys.version_info >= (3, 11):
+        from builtins import BaseExceptionGroup
+    else:
+        BaseExceptionGroup = pytest.importorskip("exceptiongroup").BaseExceptionGroup
+
+    def fail():
+        raise ValueError("inner failure")
+
+    stream = StringIO()
+    handler = logging.StreamHandler(stream)
+    handler.setFormatter(
+        ecs_logging.StdlibFormatter(stack_trace_limit=stack_trace_limit)
+    )
+    logger.addHandler(handler)
+    logger.setLevel(logging.ERROR)
+    try:
+        try:
+            fail()
+        except ValueError as error:
+            raise BaseExceptionGroup(
+                "outer", [BaseExceptionGroup("nested", [error]), KeyboardInterrupt()]
+            ) from None
+    except BaseExceptionGroup:
+        logger.exception("group failed")
+
+    error = json.loads(stream.getvalue())["error"]
+    assert error["type"] == "BaseExceptionGroup"
+    assert error["message"] == "outer (2 sub-exceptions)"
+    if stack_trace_limit == 0:
+        assert "stack_trace" not in error
+    else:
+        assert "nested (1 sub-exception)" in error["stack_trace"]
+        assert "ValueError: inner failure" in error["stack_trace"]
+        assert "KeyboardInterrupt" in error["stack_trace"]
+        if stack_trace_limit != 1:
+            assert 'raise ValueError("inner failure")' in error["stack_trace"]
 
 
 def test_exc_info_false_does_not_raise(logger):
