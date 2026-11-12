@@ -239,3 +239,67 @@ def test_exception_method_logs_error_level():
 
     ecs = json.loads(stream.getvalue().rstrip())
     assert ecs["log.level"] == "error"
+
+
+def test_scalar_error_conflicting_with_exception_raises_the_merge_error():
+    """A scalar 'error' key colliding with the stack trace must raise the
+    explanatory conflict error from merge_dicts, the same one #46 added for
+    dotted-key conflicts, not a bare 'str' object does not support item
+    assignment from inside the formatter."""
+    formatter = ecs_logging.StructlogFormatter()
+    event_dict = {
+        "event": "test message",
+        "error": "db down",
+        "exception": "<stack trace here>",
+    }
+    with pytest.raises(TypeError) as excinfo:
+        formatter(None, "error", event_dict)
+    assert "error" in str(excinfo.value)
+    assert "merging dicts would replace value" in str(excinfo.value)
+
+
+def test_scalar_log_key_raises_the_merge_error():
+    """A scalar 'log' key collides with log.level and must raise the same
+    explanatory conflict error rather than an AttributeError about
+    setdefault."""
+    formatter = ecs_logging.StructlogFormatter()
+    with pytest.raises(TypeError) as excinfo:
+        formatter(None, "debug", {"event": "test message", "log": "nope"})
+    assert "log" in str(excinfo.value)
+    assert "merging dicts would replace value" in str(excinfo.value)
+
+
+def test_dict_error_still_merges_with_the_stack_trace():
+    """Control: the working case must not change. A dict-shaped 'error'
+    keeps its own keys and gains stack_trace."""
+    formatter = ecs_logging.StructlogFormatter()
+    out = json.loads(
+        formatter(
+            None,
+            "error",
+            {
+                "event": "test message",
+                "error": {"code": 42},
+                "exception": "<stack trace here>",
+            },
+        )
+    )
+    assert out["error"]["code"] == 42
+    assert out["error"]["stack_trace"] == "<stack trace here>"
+
+
+def test_user_supplied_log_level_still_wins():
+    """Control: a caller-supplied log.level must still take precedence over
+    the structlog method name, which is what setdefault was doing."""
+    formatter = ecs_logging.StructlogFormatter()
+    out = json.loads(
+        formatter(None, "debug", {"event": "test message", "log": {"level": "custom"}})
+    )
+    assert out["log.level"] == "custom"
+
+
+def test_log_level_is_still_set_when_absent():
+    """Control: with no 'log' key at all the method name is used."""
+    formatter = ecs_logging.StructlogFormatter()
+    out = json.loads(formatter(None, "warning", {"event": "test message"}))
+    assert out["log.level"] == "warning"
