@@ -1,3 +1,6 @@
+# pull_request_target is kept on purpose: it is the only trigger that gives PRs from forks a
+# token that can write labels. No PR code is checked out or run; the job only calls the
+# GitHub API with event metadata (actor, PR number).
 name: "Issue Labeler"
 on:
   issues:
@@ -5,39 +8,42 @@ on:
   pull_request_target:
     types: [opened]
 
-# '*: write' permissions for https://docs.github.com/en/rest/issues/labels?apiVersion=2022-11-28#add-labels-to-an-issue
-permissions:
-  contents: read
-  issues: write
-  pull-requests: write
+permissions: {}
 
 jobs:
   triage:
+    permissions:
+      # '*: write' permissions for https://docs.github.com/en/rest/issues/labels?apiVersion=2022-11-28#add-labels-to-an-issue
+      contents: read
+      issues: write
+      pull-requests: write
     runs-on: ubuntu-latest
     steps:
     - name: Add agent-python label
-      uses: actions-ecosystem/action-add-labels@v1
+      uses: actions-ecosystem/action-add-labels@bd52874380e3909a1ac983768df6976535ece7f8 # v1.1.0
       with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
         labels: agent-python
 
     - name: Get token
       id: get_token
-      uses: actions/create-github-app-token@v3
+      uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
       with:
         app-id: ${{ secrets.OBS_AUTOMATION_APP_ID }}
         private-key: ${{ secrets.OBS_AUTOMATION_APP_PEM }}
         permission-members: read
 
     - id: is_elastic_member
-      uses: elastic/oblt-actions/github/is-member-of@v1
+      uses: elastic/oblt-actions/github/is-member-of@208d03b3c3dfec874e5f2d73b2c938e493fc6953 # v1.43.0
       with:
         github-org: "elastic"
         github-user: ${{ github.actor }}
         github-token: ${{ steps.get_token.outputs.token }}
     - name: Add community and triage labels
       if: contains(steps.is_elastic_member.outputs.result, 'false') && github.actor != 'dependabot[bot]' && github.actor != 'apmmachine'
-      uses: actions-ecosystem/action-add-labels@v1
+      uses: actions-ecosystem/action-add-labels@bd52874380e3909a1ac983768df6976535ece7f8 # v1.1.0
       with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
         labels: |
           community
           triage
