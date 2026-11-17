@@ -15,6 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
+from collections.abc import MutableMapping
 import json
 from io import StringIO
 from unittest import mock
@@ -25,44 +26,70 @@ import structlog
 import ecs_logging
 
 
+class NotADict(MutableMapping):
+    def __init__(self, data):
+        self._data = dict(data)
+
+    def __getitem__(self, key):
+        return self._data.__getitem__(key)
+
+    def __setitem__(self, key, value):
+        self._data.__setitem__(key, value)
+
+    def __delitem__(self, key):
+        return self._data.__delitem__(key)
+
+    def __iter__(self):
+        return self._data.__iter__()
+
+    def __len__(self):
+        return self._data.__len__()
+
+
 class NotSerializable:
     def __repr__(self):
         return "<NotSerializable>"
 
 
-@pytest.fixture
-def event_dict():
-    return {
+@pytest.fixture(params=[False, True], ids=["dict", "mapping"])
+def event(request):
+    data = {
         "event": "test message",
         "log.logger": "logger-name",
         "foo": "bar",
         "baz": NotSerializable(),
     }
+    if request.param:
+        return NotADict(data)
+    return data
 
 
-@pytest.fixture
-def event_dict_with_exception():
-    return {
+@pytest.fixture(params=[False, True], ids=["dict", "mapping"])
+def event_with_exception(request):
+    data = {
         "event": "test message",
         "log.logger": "logger-name",
         "foo": "bar",
         "exception": "<stack trace here>",
     }
+    if request.param:
+        return NotADict(data)
+    return data
 
 
-def test_conflicting_event_dict(event_dict):
+def test_conflicting_event_dict(event):
     formatter = ecs_logging.StructlogFormatter()
-    event_dict["foo.bar"] = "baz"
+    event["foo.bar"] = "baz"
     with pytest.raises(TypeError):
-        formatter(None, "debug", event_dict)
+        formatter(None, "debug", event)
 
 
 @mock.patch("time.time")
-def test_event_dict_formatted(time, spec_validator, event_dict):
+def test_event_dict_formatted(time, spec_validator, event):
     time.return_value = 1584720997.187709
 
     formatter = ecs_logging.StructlogFormatter()
-    assert spec_validator(formatter(None, "debug", event_dict)) == (
+    assert spec_validator(formatter(None, "debug", event)) == (
         '{"@timestamp":"2020-03-20T16:16:37.187Z","log.level":"debug",'
         '"message":"test message",'
         '"baz":"<NotSerializable>",'
@@ -95,12 +122,10 @@ def test_can_be_set_as_processor(time, spec_validator):
 
 
 def test_exception_log_is_ecs_compliant_when_used_with_format_exc_info(
-    event_dict_with_exception,
+    event_with_exception,
 ):
     formatter = ecs_logging.StructlogFormatter()
-    formatted_event_dict = json.loads(
-        formatter(None, "debug", event_dict_with_exception)
-    )
+    formatted_event_dict = json.loads(formatter(None, "debug", event_with_exception))
 
     assert (
         "exception" not in formatted_event_dict
@@ -217,9 +242,9 @@ def test_ensure_ascii_with_custom_fields(time):
         ("critical", "critical"),
     ],
 )
-def test_method_name_mapped_to_log_level(event_dict, method_name, level):
+def test_method_name_mapped_to_log_level(event, method_name, level):
     formatter = ecs_logging.StructlogFormatter()
-    ecs = json.loads(formatter(None, method_name, event_dict))
+    ecs = json.loads(formatter(None, method_name, event))
     assert ecs["log.level"] == level
 
 
