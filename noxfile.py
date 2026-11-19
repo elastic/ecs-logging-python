@@ -30,6 +30,7 @@ def tests_impl(session):
         "pytest",
         "--junitxml=junit-test.xml",
         "--cov=ecs_logging",
+        "--doctest-modules", "ecs_logging/",
         *(session.posargs or ("tests/",)),
         env={"PYTHONWARNINGS": "always::DeprecationWarning"},
     )
