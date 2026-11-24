@@ -1,3 +1,6 @@
+# pull_request_target is kept on purpose: it is the only trigger that gives PRs from forks a
+# token that can write labels. No PR code is checked out or run; the job only calls the
+# GitHub API with event metadata (actor, PR number).
 name: "Issue Labeler"
 on:
   issues:
@@ -5,19 +8,21 @@ on:
   pull_request_target:
     types: [opened]
 
-# '*: write' permissions for https://docs.github.com/en/rest/issues/labels?apiVersion=2022-11-28#add-labels-to-an-issue
-permissions:
-  contents: read
-  issues: write
-  pull-requests: write
+permissions: {}
 
 jobs:
   triage:
+    permissions:
+      # '*: write' permissions for https://docs.github.com/en/rest/issues/labels?apiVersion=2022-11-28#add-labels-to-an-issue
+      contents: read
+      issues: write
+      pull-requests: write
     runs-on: ubuntu-latest
     steps:
     - name: Add agent-python label
-      uses: actions-ecosystem/action-add-labels@v1
+      uses: actions-ecosystem/action-add-labels@bd52874380e3909a1ac983768df6976535ece7f8 # v1.1.0
       with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
         labels: agent-python
 
     - name: Get token
@@ -36,8 +41,9 @@ jobs:
         github-token: ${{ steps.get_token.outputs.token }}
     - name: Add community and triage labels
       if: contains(steps.is_elastic_member.outputs.result, 'false') && github.actor != 'dependabot[bot]' && github.actor != 'apmmachine'
-      uses: actions-ecosystem/action-add-labels@v1
+      uses: actions-ecosystem/action-add-labels@bd52874380e3909a1ac983768df6976535ece7f8 # v1.1.0
       with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
         labels: |
           community
           triage
